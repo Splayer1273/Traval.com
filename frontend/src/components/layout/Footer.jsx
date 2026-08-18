@@ -17,12 +17,12 @@ const COLUMNS = [
     ],
   },
   {
-    title: 'Travel',
+    title: 'Corporate Travel',
     links: [
-      { label: 'Flights', to: '/flights' },
-      { label: 'Hotels', to: '/hotels' },
-      { label: 'Packages', to: '/packages' },
-      { label: 'Destinations', to: '/destinations' },
+      { label: 'Search Flights', to: '/flights' },
+      { label: 'Search Hotels', to: '/hotels' },
+      { label: 'My Trips', to: '/my-trips' },
+      { label: 'Travel Policy', to: '/admin/policies' },
     ],
   },
   {
@@ -72,24 +72,24 @@ export default function Footer() {
       <div className="border-b border-white/10">
         <div className="container-x flex flex-col items-center justify-between gap-5 py-8 lg:flex-row">
           <div className="text-center lg:text-left">
-            <h3 className="font-display text-xl font-semibold text-white">Never miss a deal ✈️</h3>
-            <p className="mt-1 text-sm text-slate-400">Get flight price alerts, hotel offers and package drops straight to your inbox.</p>
+            <h3 className="font-display text-xl font-semibold text-white">Corporate travel desk</h3>
+            <p className="mt-1 text-sm text-slate-400">Policy questions, booking help or urgent approvals — our travel desk is available 24×7 for Acme employees.</p>
           </div>
-          <form onSubmit={subscribe} className="flex w-full max-w-md gap-2">
+          <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row">
             <div className="relative flex-1">
               <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-500" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email address"
+                placeholder="Work email for travel updates"
                 className="h-11 w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-sun-500 focus:outline-none focus:ring-2 focus:ring-sun-500/40"
               />
             </div>
-            <button type="submit" className="flex h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-sun-500 to-sun-600 px-5 text-sm font-bold text-white transition-all hover:from-sun-600 hover:to-sun-700">
-              <Send className="size-4" /> Subscribe
+            <button type="submit" className="flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sun-500 to-sun-600 px-5 text-sm font-bold text-white transition-all hover:from-sun-600 hover:to-sun-700">
+              <Send className="size-4" /> Sign up
             </button>
-          </form>
+          </div>
         </div>
       </div>
 
@@ -98,7 +98,7 @@ export default function Footer() {
         <div className="lg:col-span-2">
           <Logo light />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-400">
-            Project Sunrise helps you search flights, discover hotels and plan unforgettable trips — all in one beautifully simple place.
+            Project Sunrise is the corporate travel platform for Acme Technologies — policy-aware flight & hotel booking, manager approvals and spend control in one place.
           </p>
           <div className="mt-5 space-y-2 text-sm text-slate-400">
             <p className="flex items-center gap-2"><Phone className="size-4 text-sun-500" /> +91 1800 419 4200 (24×7)</p>
@@ -139,7 +139,7 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/10">
         <div className="container-x flex flex-col items-center justify-between gap-4 py-6 sm:flex-row">
-          <p className="text-xs text-slate-500">© 2026 Project Sunrise Travel & Explore Pvt. Ltd. All rights reserved.</p>
+          <p className="text-xs text-slate-500">© 2026 Project Sunrise · Corporate Travel Management for Acme Technologies Pvt. Ltd.</p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
             <span className="flex items-center gap-1.5"><ShieldCheck className="size-4 text-emerald-400" /> Secure 256-bit payments</span>
             <span className="flex items-center gap-1.5"><BadgeCheck className="size-4 text-brand-400" /> IATA Accredited</span>

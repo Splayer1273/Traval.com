@@ -1,88 +1,31 @@
-import { delay } from '../lib/api.js'
-import { FLIGHT_ROUTES, CABIN_MULTIPLIER } from '../data/flights.js'
+import { api, delay } from '../lib/api.js'
+import { FLIGHT_ROUTES } from '../data/flights.js'
 import { getAirline } from '../data/airlines.js'
 import { getAirport } from '../data/airports.js'
-import { addDays, todayISO } from '../utils/format.js'
+import { addDays } from '../utils/format.js'
 
 /**
- * Flight service. Mock search over a real inventory — structured so the
- * methods can be swapped for backend calls later.
+ * Flight service — search and detail now come from the backend API
+ * (`GET /api/travel/flights/*`), which serves the same mock inventory the
+ * app used to search locally. Flight status + price alerts remain client
+ * mocks (demo extras, not part of the booking flow).
  */
 
-function minutesToISO(dateISO, minutes) {
-  const d = new Date(`${dateISO}T00:00:00`)
-  d.setMinutes(d.getMinutes() + minutes)
-  return d.toISOString()
-}
-
-function routeKey(from, to) {
-  return [from, to].sort().join('-')
-}
-
-function buildFlight(base, dateISO, cabin, direction) {
-  const airline = getAirline(base.airline)
-  const fromCode = direction === 'out' ? base.route[0] : base.route[1]
-  const toCode = direction === 'out' ? base.route[1] : base.route[0]
-  const dep = base.dep + (direction === 'return' ? Math.floor(Math.random() * 8) * 15 : 0)
-  const arr = dep + base.dur
-  const multiplier = CABIN_MULTIPLIER[cabin] ?? 1
-  const price = Math.round((base.price * multiplier) / 10) * 10
-  return {
-    // Deterministic id (flight number) so FlightDetails can re-find this flight.
-    id: `${base.flightNumber}-${dateISO}`,
-    flightNumber: base.flightNumber,
-    airlineId: base.airline,
-    airline: airline.name,
-    airlineCode: airline.code,
-    airlineColor: airline.color,
-    aircraft: base.aircraft,
-    cabin,
-    origin: getAirport(fromCode),
-    destination: getAirport(toCode),
-    departure: minutesToISO(dateISO, dep),
-    arrival: minutesToISO(dateISO, arr),
-    durationMin: base.dur,
-    stops: base.stops,
-    stopCity: base.stopCity ? getAirport(base.stopCity)?.city : null,
-    price,
-    refundable: base.refundable,
-    baggage: { cabin: '7 kg', checkin: base.route[0] === base.route[1] ? '15 kg' : '23 kg' },
-    seatsLeft: 2 + Math.floor(Math.random() * 8),
-  }
-}
+const unwrap = (res) => res.data?.data ?? res.data
 
 export const flightApi = {
   /** Search outbound (and optionally return) flights. */
   async searchFlights({ from, to, date, returnDate, cabin = 'Economy', adults = 1 }) {
-    // Real: return (await api.get('/flights/search', { params })).data
-    await delay(800)
-    if (!from || !to) return { outbound: [], returnFlights: null }
-    if (from === to) throw new Error('Origin and destination cannot be the same.')
-    const outbound = FLIGHT_ROUTES.filter(
-      (f) => routeKey(f.route[0], f.route[1]) === routeKey(from, to),
-    ).map((f) => buildFlight(f, date || todayISO(1), cabin, 'out'))
-
-    let returnFlights = null
-    if (returnDate) {
-      returnFlights = FLIGHT_ROUTES.filter(
-        (f) => routeKey(f.route[0], f.route[1]) === routeKey(from, to),
-      ).map((f) => buildFlight(f, returnDate, cabin, 'return'))
-    }
-    return { outbound, returnFlights }
+    const res = await api.get('/travel/flights/search', {
+      params: { from, to, date, returnDate, cabin, adults },
+    })
+    return unwrap(res)
   },
 
+  /** Flight detail — id is `${flightNumber}-${dateISO}` (resolved server-side). */
   async getFlight(id) {
-    // Real: return (await api.get(`/flights/${id}`)).data
-    await delay(350)
-    // id = `${flightNumber}-${dateISO}`; flight numbers contain hyphens, so split at the LAST hyphen.
-    const raw = id || ''
-    const idx = raw.lastIndexOf('-')
-    if (idx === -1) return null // malformed id (no date suffix)
-    const flightNumber = raw.slice(0, idx)
-    const date = raw.slice(idx + 1)
-    const base = FLIGHT_ROUTES.find((f) => f.flightNumber === flightNumber)
-    if (!base) return null
-    return buildFlight(base, date || todayISO(3), 'Economy', 'out')
+    const res = await api.get(`/travel/flights/${encodeURIComponent(id)}`)
+    return unwrap(res)
   },
 
   async getPriceAlerts() {

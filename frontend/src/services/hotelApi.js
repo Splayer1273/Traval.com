@@ -1,36 +1,23 @@
-import { delay } from '../lib/api.js'
-import { HOTELS } from '../data/hotels.js'
+import { api } from '../lib/api.js'
 
 /**
- * Hotel service — mock search + detail, API-ready shape.
+ * Hotel service — search and detail now come from the backend API
+ * (`GET /api/travel/hotels/*`), which serves the same inventory the app
+ * used to search locally.
  */
 
-const LOWER = (s) => (s || '').toLowerCase()
+const unwrap = (res) => res.data?.data ?? res.data
 
 export const hotelApi = {
   async searchHotels({ destination, checkIn, checkOut, guests = 2, rooms = 1 }) {
-    // Real: return (await api.get('/hotels', { params })).data
-    await delay(850)
-    let results = HOTELS
-    if (destination) {
-      const q = LOWER(destination)
-      results = HOTELS.filter(
-        (h) =>
-          LOWER(h.name).includes(q) ||
-          LOWER(h.city).includes(q) ||
-          LOWER(h.country).includes(q),
-      )
-    }
-    return results.map((h) => ({
-      ...h,
-      nights: null,
-      totalForStay: null,
-    }))
+    const res = await api.get('/travel/hotels/search', {
+      params: { destination, checkIn, checkOut, guests, rooms },
+    })
+    return unwrap(res)
   },
 
   async getHotel(id) {
-    // Real: return (await api.get(`/hotels/${id}`)).data
-    await delay(350)
-    return HOTELS.find((h) => h.id === id) ?? null
+    const res = await api.get(`/travel/hotels/${encodeURIComponent(id)}`)
+    return unwrap(res)
   },
 }

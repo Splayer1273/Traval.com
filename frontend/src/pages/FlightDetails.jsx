@@ -4,6 +4,7 @@ import {
   Plane, Luggage, ShieldCheck, Clock, AlertTriangle, Check, Info, ArrowRight,
 } from 'lucide-react'
 import PageHero from '../components/PageHero.jsx'
+import MobileActionBar from '../components/layout/MobileActionBar.jsx'
 import { AirlineLogo } from '../components/cards/FlightCard.jsx'
 import { Price } from '../components/Price.jsx'
 import { Badge } from '../components/ui/badge.jsx'
@@ -13,8 +14,10 @@ import { Skeleton } from '../components/ui/skeleton.jsx'
 import { Card, CardContent } from '../components/ui/card.jsx'
 import { flightApi } from '../services/flightApi.js'
 import { useBooking } from '../context/BookingContext.jsx'
+import { useTravel } from '../context/TravelContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { formatTime, formatDate, formatDay, minutesToLabel } from '../utils/format.js'
+import { PolicyNotice } from '../components/PolicyBadge.jsx'
+import { formatTime, formatDate, formatDay, minutesToLabel, todayISO } from '../utils/format.js'
 
 const FARE_RULES = [
   'Free date change up to 24 hours before departure (fare difference applies)',
@@ -32,16 +35,47 @@ export default function FlightDetails() {
   const leg = params.get('leg') === 'return' ? 'Return' : 'Outbound'
   const navigate = useNavigate()
   const { setKind } = useBooking()
-  const { isAuthenticated } = useAuth()
+  const { draft: travelDraft, setTrip, setFlight } = useTravel()
+  const { user, isAuthenticated } = useAuth()
 
   const { data: flight, isLoading } = useQuery({
     queryKey: ['flight', id],
     queryFn: () => flightApi.getFlight(id),
   })
 
+  const addDaysToISO = (iso, days) => {
+    const d = new Date(`${iso}T00:00:00`)
+    d.setDate(d.getDate() + days)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }
+
   const continueBooking = () => {
-    setKind('flight', { ...flight, leg })
-    navigate(`/flights/${id}/passengers`)
+    if (!isAuthenticated) {
+      setKind('flight', { ...flight, leg })
+      navigate(`/flights/${id}/passengers`)
+      return
+    }
+    // Corporate flow — use the draft trip if one exists, otherwise create one
+    // from this flight so the journey never dead-ends.
+    const depDate = (flight.departure || '').slice(0, 10) || todayISO()
+    const trip = travelDraft?.trip || {
+      title: `${flight.origin.city} → ${flight.destination.city} business trip`,
+      from: flight.origin.city,
+      fromCode: flight.origin.code,
+      destination: flight.destination.city,
+      destinationCode: flight.destination.code,
+      startDate: depDate,
+      endDate: addDaysToISO(depDate, 2),
+      purpose: 'Official business travel',
+      client: '',
+      department: user?.department || 'Technology',
+      project: user?.projectCode || '',
+      costCenter: user?.costCenter || '',
+      travellers: 1,
+    }
+    setTrip(trip)
+    setFlight({ ...flight, leg })
+    navigate(`/hotels?destination=${trip.destination}&checkIn=${trip.startDate}&checkOut=${trip.endDate}&corp=1`)
   }
 
   if (isLoading) {
@@ -65,7 +99,7 @@ export default function FlightDetails() {
   const layoverMinutes = Math.max(0, Math.round((new Date(flight.arrival) - new Date(flight.departure)) / 60000) - flight.durationMin)
 
   return (
-    <div>
+    <div className="pb-14 lg:pb-0">
       <PageHero image="planeWing" title={`${flight.airline} ${flight.flightNumber}`} crumb={[{ label: 'Flights', to: '/flights' }, { label: flight.flightNumber }]} />
 
       <div className="container-x mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -225,16 +259,26 @@ export default function FlightDetails() {
               <div className="rounded-lg bg-emerald-50 p-3 text-xs text-emerald-700">
                 ✓ Free cancellation up to 24h before departure{flight.refundable ? ' (refundable fare)' : ' available on flexible upgrade'}
               </div>
+              <PolicyNotice flight={flight} className="mb-3" compact />
               <Button className="w-full" size="lg" onClick={continueBooking}>
-                Continue to Passenger Details <ArrowRight className="size-4" />
+                {isAuthenticated ? 'Select this flight' : 'Continue to Passenger Details'} <ArrowRight className="size-4" />
               </Button>
-              {!isAuthenticated && (
-                <p className="text-center text-[11px] text-slate-400">You can continue as a guest or <span className="font-semibold text-brand-600">sign in</span> for faster checkout.</p>
-              )}
+              {isAuthenticated
+                ? <p className="text-center text-[11px] text-slate-400">No payment now — this selection is reviewed by your manager.</p>
+                : <p className="text-center text-[11px] text-slate-400">You can continue as a guest or <span className="font-semibold text-brand-600">sign in</span> for corporate booking.</p>}
             </div>
           </Card>
         </aside>
       </div>
+
+      {/* Mobile sticky booking bar */}
+      <MobileActionBar
+        sub={`${flight.origin.code} → ${flight.destination.code} · ${leg} · ${flight.cabin}`}
+        price={<Price amount={flight.price} className="text-xl font-bold text-slate-900" />}
+        buttonText={isAuthenticated ? 'Select flight' : 'Continue'}
+        icon={<ArrowRight className="size-4" />}
+        onClick={continueBooking}
+      />
     </div>
   )
 }

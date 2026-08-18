@@ -1,11 +1,14 @@
 import Trip from '../models/Trip.js';
+import Notification from '../models/Notification.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/AppError.js';
+import { serializeTrip } from '../utils/serialize.js';
 
 const withRefs = (q) =>
   q
-    .populate('employee', 'name email title')
+    .populate('employee', 'name email designation grade department employeeId')
     .populate('company', 'name')
+    .populate('approver', 'name email')
     .populate('approvedBy', 'name')
     .populate('approvals.manager', 'name');
 
@@ -22,7 +25,7 @@ export const getApprovals = asyncHandler(async (req, res) => {
   }
 
   const trips = await withRefs(Trip.find(filter)).sort({ createdAt: -1 });
-  res.json({ success: true, count: trips.length, data: trips });
+  res.json({ success: true, count: trips.length, data: trips.map(serializeTrip) });
 });
 
 /**
@@ -56,6 +59,29 @@ export const decideTrip = (decision) =>
       date: new Date(),
     });
 
+    // Keep the workflow timeline in sync with the decision.
+    trip.timeline = (trip.timeline || []).filter((t) => t.label !== 'Awaiting manager approval');
+    trip.timeline.push({
+      label: decision === 'approved' ? 'Approved by manager' : 'Rejected by manager',
+      time: new Date(),
+      done: true,
+    });
+
     await trip.save();
-    res.json({ success: true, message: `Trip ${decision}`, data: await withRefs(Trip.findById(trip._id)) });
+
+    // Notify the employee of the decision.
+    await Notification.create({
+      userId: trip.employee,
+      type: decision === 'approved' ? 'approval' : 'rejected',
+      title: decision === 'approved' ? 'Trip approved' : 'Travel request rejected',
+      text:
+        decision === 'approved'
+          ? `Your ${trip.destination} trip was approved. Booking will be confirmed shortly.`
+          : comment
+            ? `Your ${trip.destination} trip was rejected. Reason: ${comment}`
+            : `Your ${trip.destination} trip was rejected.`,
+      link: `/trips/${trip._id}`,
+    });
+
+    res.json({ success: true, message: `Trip ${decision}`, data: serializeTrip(await withRefs(Trip.findById(trip._id))) });
   });

@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Check, CreditCard, Smartphone, Landmark, Wallet, ShieldCheck, Loader2,
-  Luggage, Armchair, Utensils, Plane, Ticket, ChevronLeft, PartyPopper,
+  Luggage, Armchair, Utensils, Plane, Ticket, ChevronLeft, PartyPopper, ArrowRight,
 } from 'lucide-react'
+import MobileActionBar from '../components/layout/MobileActionBar.jsx'
 import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import { Label } from '../components/ui/label.jsx'
@@ -158,7 +159,7 @@ export default function Checkout() {
   const fmt = (n) => formatMoney(convert(n, currency), currency)
 
   return (
-    <div className="bg-slate-50">
+    <div className="bg-slate-50 pb-28 lg:pb-0">
       <div className="container-x py-8">
         {/* Stepper */}
         <div className="mb-8 hidden items-center justify-center gap-2 sm:flex">
@@ -368,6 +369,22 @@ export default function Checkout() {
           </aside>
         </div>
       </div>
+
+      {/* Mobile sticky checkout bar */}
+      <MobileActionBar
+        sub={kind === 'hotel' ? 'Your stay · 2 nights' : kind === 'package' ? 'Holiday package' : `${item.origin.code} → ${item.destination.code} · ${item.cabin}`}
+        price={<span className="text-xl font-bold text-slate-900">{fmt(fares.total)}</span>}
+        buttonText={step >= 4 ? 'Pay securely' : 'Continue to Payment'}
+        icon={step >= 4 ? <ShieldCheck className="size-4" /> : <ArrowRight className="size-4" />}
+        disabled={step >= 4 && paying}
+        onClick={() => {
+          if (step >= 4) {
+            if (!paying) confirmPayment()
+          } else {
+            setStep(4)
+          }
+        }}
+      />
     </div>
   )
 }

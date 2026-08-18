@@ -11,9 +11,19 @@ export const publicUser = (u) => ({
   name: u.name,
   email: u.email,
   role: u.role,
-  company: u.company,
+  company: u.company?.name || (typeof u.company === 'string' ? u.company : null),
   title: u.title,
   phone: u.phone,
+  employeeId: u.employeeId,
+  designation: u.designation,
+  grade: u.grade,
+  department: u.department,
+  manager: u.manager,
+  managerEmail: u.managerEmail,
+  costCenter: u.costCenter,
+  projectCode: u.projectCode,
+  location: u.location,
+  createdAt: u.createdAt,
 });
 
 /**
@@ -37,6 +47,7 @@ export const register = asyncHandler(async (req, res) => {
     company: company || null,
   });
 
+  if (user.company) await user.populate('company', 'name');
   res.status(201).json({ success: true, user: publicUser(user), token: signToken(user._id) });
 });
 
@@ -53,6 +64,7 @@ export const login = asyncHandler(async (req, res) => {
   }
   if (!user.isActive) throw new AppError('This account has been deactivated', 401);
 
+  if (user.company) await user.populate('company', 'name');
   res.json({ success: true, token: signToken(user._id), user: publicUser(user) });
 });
 
@@ -60,6 +72,7 @@ export const login = asyncHandler(async (req, res) => {
  * GET /api/auth/me
  */
 export const getMe = asyncHandler(async (req, res) => {
+  if (req.user.company) await req.user.populate('company', 'name');
   res.json({ success: true, user: publicUser(req.user) });
 });
 

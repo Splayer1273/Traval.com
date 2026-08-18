@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
@@ -6,6 +6,7 @@ import {
   ShieldCheck, Check, ChevronLeft, ChevronRight, Utensils, Car, Waves, BedDouble, ArrowRight,
 } from 'lucide-react'
 import PageHero from '../components/PageHero.jsx'
+import MobileActionBar from '../components/layout/MobileActionBar.jsx'
 import Img from '../components/Img.jsx'
 import { Price } from '../components/Price.jsx'
 import { StarRating, GuestRating } from '../components/Rating.jsx'
@@ -19,7 +20,11 @@ import { hotelApi } from '../services/hotelApi.js'
 import { getReviews } from '../data/reviews.js'
 import { useWishlist } from '../context/WishlistContext.jsx'
 import { useBooking } from '../context/BookingContext.jsx'
+import { useTravel } from '../context/TravelContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../context/ToastContext.jsx'
+import { PolicyNotice } from '../components/PolicyBadge.jsx'
+import { daysBetween } from '../utils/format.js'
 import { cn } from '../lib/utils.js'
 
 const AMENITY_ICONS = {
@@ -37,9 +42,28 @@ export default function HotelDetails() {
   const navigate = useNavigate()
   const { has, toggle } = useWishlist()
   const { setKind } = useBooking()
+  const { draft: travelDraft, setHotel } = useTravel()
+  const { isAuthenticated } = useAuth()
   const { toast } = useToast()
   const [activeImg, setActiveImg] = useState(0)
   const [selectedRoom, setSelectedRoom] = useState(null)
+  // Refs + effects must be declared before any early return so the hook order
+  // stays identical across renders (loading → loaded).
+  const carouselRef = useRef(null)
+  const programmaticRef = useRef(false)
+  const scrollEndTimer = useRef(null)
+
+  // While a programmatic (arrow/dot) scroll is animating, ignore onScroll so
+  // the active dot/counter don't flicker through intermediate slides.
+  useEffect(() => {
+    const el = carouselRef.current
+    const onScrollEnd = () => { programmaticRef.current = false }
+    if (el) el.addEventListener('scrollend', onScrollEnd)
+    return () => {
+      if (el) el.removeEventListener('scrollend', onScrollEnd)
+      clearTimeout(scrollEndTimer.current)
+    }
+  }, [])
 
   const { data: hotel, isLoading } = useQuery({
     queryKey: ['hotel', id],
@@ -63,18 +87,123 @@ export default function HotelDetails() {
   const room = selectedRoom || hotel.rooms[0]
   const taxPct = hotel.taxPct
 
+  const scrollToPhoto = (i) => {
+    const el = carouselRef.current
+    if (!el) return
+    const idx = Math.max(0, Math.min(hotel.images.length - 1, i))
+    programmaticRef.current = true
+    el.scrollTo({ left: idx * el.clientWidth, behavior: 'smooth' })
+    setActiveImg(idx)
+    // Fallback for browsers without the scrollend event
+    clearTimeout(scrollEndTimer.current)
+    scrollEndTimer.current = setTimeout(() => { programmaticRef.current = false }, 600)
+  }
+
+  const handleCarouselScroll = () => {
+    const el = carouselRef.current
+    if (!el || el.clientWidth === 0 || programmaticRef.current) return
+    const idx = Math.min(Math.max(0, Math.round(el.scrollLeft / el.clientWidth)), hotel.images.length - 1)
+    if (idx !== activeImg) setActiveImg(idx)
+  }
+
   const reserve = () => {
     if (!room) return toast('Please select a room to continue.', 'Room required')
+    const trip = travelDraft?.trip
+    if (isAuthenticated) {
+      // Corporate flow — attach the hotel to the business trip and review.
+      setHotel(hotel, room)
+      toast(`Hotel selected — ${room.name}`, 'Added to trip')
+      navigate('/trips/review')
+      return
+    }
     setKind('hotel', { hotel, room, nights: 2, checkIn: new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10), checkOut: new Date(Date.now() + 16 * 864e5).toISOString().slice(0, 10) })
     toast(`Room selected — ${room.name}`, 'Great choice')
     navigate('/checkout')
   }
 
   return (
-    <div>
+    <div className="pb-14 lg:pb-0">
       {/* Gallery */}
       <section className="relative">
-        <div className="relative h-72 sm:h-96 lg:h-[480px]">
+        {/* Mobile: swipeable photo carousel (native touch scroll + snap) */}
+        <div className="md:hidden">
+          <div className="relative h-72">
+            <div
+              ref={carouselRef}
+              onScroll={handleCarouselScroll}
+              role="region"
+              aria-roledescription="carousel"
+              aria-label={`${hotel.name} photos`}
+              className="flex h-full snap-x snap-mandatory overflow-x-auto scrollbar-hide"
+            >
+              {hotel.images.map((img, i) => (
+                <div key={img + i} className="relative h-full w-full shrink-0 snap-center">
+                  <Img src={img} alt={`${hotel.name} view ${i + 1}`} className="absolute inset-0" eager={i === 0} />
+                </div>
+              ))}
+            </div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-slate-950/10" />
+
+            {/* Photo counter */}
+            <span aria-live="polite" className="absolute right-3 top-3 rounded-full bg-slate-950/55 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur">
+              {activeImg + 1} / {hotel.images.length}
+            </span>
+
+            {/* Prev / next */}
+            <button
+              type="button"
+              aria-label="Previous photo"
+              onClick={() => scrollToPhoto(activeImg - 1)}
+              disabled={activeImg === 0}
+              className="absolute left-2.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow-card backdrop-blur transition-transform active:scale-90 disabled:opacity-40"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <button
+              type="button"
+              aria-label="Next photo"
+              onClick={() => scrollToPhoto(activeImg + 1)}
+              disabled={activeImg === hotel.images.length - 1}
+              className="absolute right-2.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow-card backdrop-blur transition-transform active:scale-90 disabled:opacity-40"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+
+            {/* Dots */}
+            <div className="absolute inset-x-0 bottom-12 flex items-center justify-center gap-1.5">
+              {hotel.images.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  aria-label={`Go to photo ${i + 1}`}
+                  aria-current={i === activeImg ? 'true' : undefined}
+                  onClick={() => scrollToPhoto(i)}
+                  className={cn(
+                    'h-1.5 rounded-full transition-all duration-300',
+                    i === activeImg ? 'w-5 bg-white' : 'w-1.5 bg-white/60',
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Floating title card */}
+          <div className="container-x relative z-10 -mt-10">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="bg-brand-50 text-brand-700">{hotel.city}, {hotel.country}</Badge>
+                <StarRating value={hotel.star} size="size-4" />
+              </div>
+              <h1 className="mt-2 font-display text-2xl font-semibold text-slate-900">{hotel.name}</h1>
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
+                <MapPin className="size-4 shrink-0" /> {hotel.address}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop: hero image + title overlay */}
+        <div className="relative hidden h-96 md:block lg:h-[480px]">
           <Img src={hotel.images[activeImg]} alt={hotel.name} className="absolute inset-0" eager />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/20" />
           <div className="absolute inset-x-0 bottom-0">
@@ -89,8 +218,8 @@ export default function HotelDetails() {
           </div>
         </div>
 
-        {/* Thumbnails */}
-        <div className="container-x -mt-8 relative z-10">
+        {/* Desktop thumbnails */}
+        <div className="container-x -mt-8 relative z-10 hidden md:block">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {hotel.images.map((img, i) => (
               <button
@@ -314,14 +443,27 @@ export default function HotelDetails() {
                 <span className="font-semibold text-slate-800">Total for 2 nights</span>
                 <Price amount={(room.price + Math.round((room.price * taxPct) / 100)) * 2} className="text-2xl font-bold text-slate-900" />
               </div>
+              <PolicyNotice hotel={hotel} room={room} className="mb-3" compact />
               <div className="rounded-lg bg-emerald-50 p-3 text-xs text-emerald-700">✓ Free cancellation up to 48h before check-in</div>
               <Button size="lg" className="w-full" onClick={reserve}>
-                Reserve Now <ArrowRight className="size-4" />
+                {isAuthenticated ? 'Select this hotel' : 'Reserve Now'} <ArrowRight className="size-4" />
               </Button>
+              {isAuthenticated && <p className="text-center text-[11px] text-slate-400">No payment now — this goes into your travel request for approval.</p>}
             </div>
           </Card>
         </aside>
       </div>
+
+      {/* Mobile sticky booking bar */}
+      <MobileActionBar
+        sub={`${hotel.city}, ${hotel.country} · ${room.name}`}
+        price={
+          <Price amount={(room.price + Math.round((room.price * taxPct) / 100)) * 2} className="text-xl font-bold text-slate-900" />
+        }
+        buttonText={isAuthenticated ? 'Select hotel' : 'Reserve'}
+        icon={<ArrowRight className="size-4" />}
+        onClick={reserve}
+      />
     </div>
   )
 }

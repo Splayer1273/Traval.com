@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Plus, Trash2, ArrowRight, UserRound, Plane, Contact, PhoneCall } from 'lucide-react'
+import MobileActionBar from '../components/layout/MobileActionBar.jsx'
 import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import { Label } from '../components/ui/label.jsx'
@@ -82,7 +83,7 @@ export default function PassengerDetails() {
   }
 
   return (
-    <div className="bg-slate-50">
+    <div className="bg-slate-50 pb-14 lg:pb-0">
       <div className="container-x py-8">
         {/* Stepper hint */}
         <div className="mb-6 flex flex-wrap items-center gap-2 text-xs font-semibold">
@@ -297,6 +298,20 @@ export default function PassengerDetails() {
           </aside>
         </div>
       </div>
+
+      {/* Mobile sticky booking bar */}
+      <MobileActionBar
+        sub={`${flight.origin.code} → ${flight.destination.code} · ${pCountLabel(passengers.length)}`}
+        price={
+          <p className="flex items-baseline gap-1">
+            <span className="text-xl font-bold text-slate-900">{formatMoney(convert(total, currency), currency)}</span>
+            <span className="text-[11px] font-semibold text-slate-400">total</span>
+          </p>
+        }
+        buttonText="Continue"
+        icon={<ArrowRight className="size-4" />}
+        onClick={continueCheckout}
+      />
     </div>
   )
 }

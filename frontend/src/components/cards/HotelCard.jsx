@@ -4,6 +4,7 @@ import Img from '../Img.jsx'
 import { Price } from '../Price.jsx'
 import { StarRating, GuestRating } from '../Rating.jsx'
 import { Badge } from '../ui/badge.jsx'
+import { PolicyBadge } from '../PolicyBadge.jsx'
 import { useWishlist } from '../../context/WishlistContext.jsx'
 import { cn } from '../../lib/utils.js'
 
@@ -14,7 +15,7 @@ export default function HotelCard({ hotel }) {
   const total = (hotel.pricePerNight + taxes) * 2
 
   return (
-    <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift">
+    <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lift">
       <div className="grid md:grid-cols-[280px_1fr]">
         <Link to={`/hotels/${hotel.id}`} className="relative block h-52 overflow-hidden md:h-auto">
           <Img
@@ -75,9 +76,10 @@ export default function HotelCard({ hotel }) {
           </div>
 
           <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t border-slate-100 pt-3">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <Badge variant="success"><Coffee className="size-3" /> Breakfast</Badge>
+                <PolicyBadge hotel={hotel} room={{ price: hotel.pricePerNight, nights: 2 }} />
               </div>
               <p className="text-xs text-slate-400">2 nights · incl. taxes</p>
             </div>

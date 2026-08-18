@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Luggage, Plane, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Clock, Luggage, Plane, ShieldCheck, Users } from 'lucide-react'
 import { Badge } from '../ui/badge.jsx'
 import { Price } from '../Price.jsx'
+import { PolicyBadge } from '../PolicyBadge.jsx'
 import { formatTime, formatDay, formatDateShort, minutesToLabel } from '../../utils/format.js'
 import { cn } from '../../lib/utils.js'
 
@@ -17,76 +18,93 @@ export function AirlineLogo({ code, color, size = 'size-10' }) {
   )
 }
 
-export default function FlightCard({ flight, showReturn = false }) {
+export default function FlightCard({ flight, showReturn = false, highlight = null }) {
   const overnight = new Date(flight.arrival).getDate() !== new Date(flight.departure).getDate()
   return (
-    <div className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-card transition-all duration-300 hover:border-brand-300 hover:shadow-lift sm:p-5">
-      <div className="grid items-center gap-4 lg:grid-cols-[1fr_auto]">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-3">
-            <AirlineLogo code={flight.airlineCode} color={flight.airlineColor} />
-            <div>
-              <p className="text-sm font-bold text-slate-900">{flight.airline}</p>
-              <p className="text-xs text-slate-500">{flight.flightNumber} · {flight.aircraft}</p>
-            </div>
-          </div>
+    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lift">
+      {/* Highlight ribbon (e.g. "Cheapest", "Best value") */}
+      {highlight && (
+        <div className="absolute left-0 top-0 z-10 rounded-br-2xl bg-gradient-to-r from-sun-500 to-sun-600 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-soft">
+          {highlight}
+        </div>
+      )}
 
-          <div className="flex flex-1 items-center gap-4 sm:gap-6">
-            <div className="text-center sm:text-left">
-              <p className="text-lg font-bold text-slate-900">{formatTime(flight.departure)}</p>
-              <p className="text-xs font-semibold text-slate-600">{flight.origin.code}</p>
-              <p className="text-[11px] text-slate-400">{formatDateShort(flight.departure)}</p>
-            </div>
-
-            <div className="flex flex-1 flex-col items-center px-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-slate-500">{minutesToLabel(flight.durationMin)}</span>
-                {overnight && <Badge variant="secondary">+1</Badge>}
-              </div>
-              <div className="relative my-1 h-px w-full min-w-20 bg-slate-200">
-                <div className="absolute -left-1 top-1/2 size-2 -translate-y-1/2 rounded-full border-2 border-slate-300 bg-white" />
-                <Plane className="absolute -right-2 top-1/2 size-3.5 -translate-y-1/2 rotate-90 text-brand-500" />
-                <div className="absolute -right-1 top-1/2 size-2 -translate-y-1/2 rounded-full border-2 border-brand-400 bg-white" />
-              </div>
-              <p className="text-[11px] font-medium text-slate-500">
-                {flight.stops === 0 ? 'Non-stop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}${flight.stopCity ? ` · ${flight.stopCity}` : ''}`}
-              </p>
-            </div>
-
-            <div className="text-center sm:text-right">
-              <p className="text-lg font-bold text-slate-900">{formatTime(flight.arrival)}</p>
-              <p className="text-xs font-semibold text-slate-600">{flight.destination.code}</p>
-              <p className="text-[11px] text-slate-400">{formatDateShort(flight.arrival)}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center gap-3 lg:flex-col lg:items-end lg:gap-2">
-            <Price amount={flight.price} className="text-2xl font-bold text-slate-900" />
-            <p className="text-[11px] text-slate-400">per person</p>
-            <div className="flex gap-1.5">
-              <Badge variant={flight.refundable ? 'success' : 'secondary'}>
-                <ShieldCheck className="size-3" /> {flight.refundable ? 'Refundable' : 'Non-refundable'}
-              </Badge>
-              <Badge variant="outline">
-                <Luggage className="size-3" /> {flight.baggage.checkin}
-              </Badge>
-            </div>
+      <div className={cn('grid gap-4 p-4 sm:p-5 lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-6', highlight && 'pt-3 sm:pt-4')}>
+        {/* Airline */}
+        <div className="flex items-center gap-3">
+          <AirlineLogo code={flight.airlineCode} color={flight.airlineColor} />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold text-slate-900">{flight.airline}</p>
+            <p className="text-xs text-slate-500">{flight.flightNumber} · {flight.aircraft}</p>
           </div>
         </div>
 
-        <div className="lg:pl-4">
+        {/* Route timeline */}
+        <div className="flex items-center gap-3 sm:gap-5">
+          <div className="min-w-0 text-center sm:text-left">
+            <p className="text-xl font-bold text-slate-900 sm:text-2xl">{formatTime(flight.departure)}</p>
+            <p className="text-sm font-bold text-slate-700">
+              {flight.origin.code}
+              <span className="hidden font-medium text-slate-400 sm:inline"> · {flight.origin.city}</span>
+            </p>
+            <p className="text-[11px] text-slate-400">{formatDay(flight.departure)}, {formatDateShort(flight.departure)}</p>
+          </div>
+
+          <div className="flex flex-1 flex-col items-center">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
+              <span>{minutesToLabel(flight.durationMin)}</span>
+              {overnight && <Badge variant="secondary">+1</Badge>}
+            </div>
+            <div className="relative my-1.5 h-0.5 w-full min-w-16 rounded-full bg-slate-200">
+              <div className="absolute -left-1 top-1/2 size-2.5 -translate-y-1/2 rounded-full border-2 border-slate-300 bg-white" />
+              <Plane className="absolute left-1/2 top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rotate-90 text-brand-500 transition-transform duration-300 group-hover:translate-x-0.5" />
+              <div className="absolute -right-1 top-1/2 size-2.5 -translate-y-1/2 rounded-full border-2 border-brand-400 bg-white" />
+            </div>
+            <p className="text-[11px] font-medium text-slate-500">
+              {flight.stops === 0 ? 'Non-stop' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}${flight.stopCity ? ` · ${flight.stopCity}` : ''}`}
+            </p>
+          </div>
+
+          <div className="min-w-0 text-center sm:text-right">
+            <p className="text-xl font-bold text-slate-900 sm:text-2xl">{formatTime(flight.arrival)}</p>
+            <p className="text-sm font-bold text-slate-700">
+              {flight.destination.code}
+              <span className="hidden font-medium text-slate-400 sm:inline"> · {flight.destination.city}</span>
+            </p>
+            <p className="text-[11px] text-slate-400">{formatDay(flight.arrival)}, {formatDateShort(flight.arrival)}</p>
+          </div>
+        </div>
+
+        {/* Price + CTA */}
+        <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-3 lg:flex-col lg:items-end lg:border-0 lg:pt-0">
+          <div>
+            <p className="text-lg font-bold text-slate-900 sm:text-xl">
+              <Price amount={flight.price} />
+            </p>
+            <p className="text-[11px] text-slate-400">per person · taxes incl.</p>
+          </div>
           <Link
             to={`/flights/${flight.id}${showReturn ? '?leg=return' : ''}`}
-            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 px-8 text-sm font-bold text-white shadow-glow transition-all hover:from-brand-700 hover:to-brand-800 active:scale-[0.98]"
+            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 px-6 text-sm font-bold text-white shadow-glow transition-all hover:from-brand-700 hover:to-brand-800 active:scale-[0.98]"
           >
             Select <ArrowRight className="size-4" />
           </Link>
-          <p className="mt-2 text-center text-[11px] text-slate-400">{flight.seatsLeft} seats left at this price</p>
         </div>
       </div>
-      <p className="mt-3 text-xs text-slate-500">
-        <span className="font-semibold text-slate-700">{formatDay(flight.departure)}</span> departure · {flight.cabin} class
-      </p>
+
+      {/* Meta row */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-slate-100 bg-slate-50/60 px-4 py-2.5 text-xs text-slate-500 sm:px-5">
+        <span className="flex items-center gap-1.5"><Clock className="size-3.5 text-slate-400" /> {minutesToLabel(flight.durationMin)}</span>
+        <span className="flex items-center gap-1.5"><Luggage className="size-3.5 text-slate-400" /> {flight.baggage.checkin}</span>
+        <span className="flex items-center gap-1.5"><Plane className="size-3.5 text-slate-400" /> {flight.cabin}</span>
+        <Badge variant={flight.refundable ? 'success' : 'secondary'}>
+          <ShieldCheck className="size-3" /> {flight.refundable ? 'Refundable' : 'Non-refundable'}
+        </Badge>
+        <PolicyBadge flight={flight} />
+        <span className="ml-auto flex items-center gap-1.5 text-[11px] text-slate-400">
+          <Users className="size-3.5" /> {flight.seatsLeft} seats left
+        </span>
+      </div>
     </div>
   )
 }

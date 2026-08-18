@@ -4,9 +4,9 @@ import Logo from './Logo.jsx'
 import Img from '../Img.jsx'
 
 const FEATURES = [
-  { icon: ShieldCheck, title: 'Secure & trusted', text: '256-bit encrypted payments, PCI-DSS compliant.' },
-  { icon: BadgePercent, title: 'Best price promise', text: 'Price alerts and member-only deals every week.' },
-  { icon: Headphones, title: '24×7 human support', text: 'Real people on chat and phone, around the clock.' },
+  { icon: ShieldCheck, title: 'Policy-first booking', text: 'Every flight and hotel is checked against your company travel policy.' },
+  { icon: BadgePercent, title: 'Approval workflow built in', text: 'Requests reach your manager with purpose, cost and compliance context.' },
+  { icon: Headphones, title: 'Corporate travel desk', text: 'Dedicated 24×7 support for employees and travel administrators.' },
 ]
 
 export default function AuthLayout({ title, subtitle, children, footer }) {
@@ -20,10 +20,10 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
           <Logo light />
           <div>
             <p className="max-w-md font-display text-4xl font-semibold leading-tight">
-              Your journey starts the moment you arrive.
+              Business travel, approval-ready.
             </p>
             <p className="mt-3 max-w-sm text-sm text-slate-300">
-              Join millions of travellers who search, compare and book flights, hotels and holidays with Project Sunrise.
+              The corporate travel portal for Acme Technologies — plan official trips, stay within policy and get manager approval in a few clicks.
             </p>
             <div className="mt-8 space-y-4">
               {FEATURES.map((f) => (
@@ -39,7 +39,7 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
               ))}
             </div>
           </div>
-          <p className="text-xs text-slate-400">© 2026 Project Sunrise Travel & Explore</p>
+          <p className="text-xs text-slate-400">© 2026 Project Sunrise · Corporate Travel Management</p>
         </div>
       </div>
 

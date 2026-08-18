@@ -24,7 +24,13 @@ export function ToastProvider({ children }) {
   }, [])
 
   const push = useCallback(
+    // Supports both conventions: toast(msg, 'Title') and toast(msg, 'error', 'Title').
+    // A non-status second arg (the app-wide pattern) is treated as the title.
     (message, type = 'success', title) => {
+      if (!(type in ICONS)) {
+        title = type
+        type = 'success'
+      }
       const id = Math.random().toString(36).slice(2)
       setToasts((t) => [...t, { id, message, type, title }])
       setTimeout(() => dismiss(id), 4200)

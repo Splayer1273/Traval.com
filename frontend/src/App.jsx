@@ -1,6 +1,20 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/layout/Layout.jsx'
+import RequireRole from './components/RequireRole.jsx'
 import Home from './pages/Home.jsx'
+import CreateTrip from './pages/CreateTrip.jsx'
+import TripReview from './pages/TripReview.jsx'
+import TripDetail from './pages/TripDetail.jsx'
+import Approvals from './pages/Approvals.jsx'
+import Claims from './pages/Claims.jsx'
+import SubmitClaim from './pages/SubmitClaim.jsx'
+import NotificationsPage from './pages/NotificationsPage.jsx'
+import CorporateProfile from './pages/CorporateProfile.jsx'
+import AdminDashboard from './pages/admin/AdminDashboard.jsx'
+import AdminPolicies from './pages/admin/AdminPolicies.jsx'
+import AdminEmployees from './pages/admin/AdminEmployees.jsx'
+import AdminBookings from './pages/admin/AdminBookings.jsx'
+import AdminReports from './pages/admin/AdminReports.jsx'
 import FlightSearch from './pages/FlightSearch.jsx'
 import FlightDetails from './pages/FlightDetails.jsx'
 import PassengerDetails from './pages/PassengerDetails.jsx'
@@ -50,6 +64,23 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+
+        {/* Corporate travel */}
+        <Route path="/trips/new" element={<RequireRole><CreateTrip /></RequireRole>} />
+        <Route path="/trips/review" element={<RequireRole><TripReview /></RequireRole>} />
+        <Route path="/trips/:id" element={<RequireRole><TripDetail /></RequireRole>} />
+        <Route path="/approvals" element={<RequireRole roles={['approver', 'admin']}><Approvals /></RequireRole>} />
+        <Route path="/claims" element={<RequireRole roles={['employee', 'finance', 'admin']}><Claims /></RequireRole>} />
+        <Route path="/claims/new" element={<RequireRole roles={['employee']}><SubmitClaim /></RequireRole>} />
+        <Route path="/notifications" element={<RequireRole><NotificationsPage /></RequireRole>} />
+        <Route path="/profile" element={<RequireRole><CorporateProfile /></RequireRole>} />
+
+        {/* Admin console */}
+        <Route path="/admin" element={<RequireRole roles={['admin']}><AdminDashboard /></RequireRole>} />
+        <Route path="/admin/policies" element={<RequireRole roles={['admin']}><AdminPolicies /></RequireRole>} />
+        <Route path="/admin/employees" element={<RequireRole roles={['admin']}><AdminEmployees /></RequireRole>} />
+        <Route path="/admin/bookings" element={<RequireRole roles={['admin']}><AdminBookings /></RequireRole>} />
+        <Route path="/admin/reports" element={<RequireRole roles={['admin']}><AdminReports /></RequireRole>} />
 
         {/* Flights */}
         <Route path="/flights" element={<FlightSearch />} />

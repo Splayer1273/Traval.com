@@ -5,6 +5,7 @@ import {
   ArrowRight, Sparkles, UserRound,
 } from 'lucide-react'
 import PageHero from '../components/PageHero.jsx'
+import MobileActionBar from '../components/layout/MobileActionBar.jsx'
 import Img from '../components/Img.jsx'
 import { Price } from '../components/Price.jsx'
 import { Badge } from '../components/ui/badge.jsx'
@@ -48,7 +49,7 @@ export default function PackageDetail() {
   }
 
   return (
-    <div>
+    <div className="pb-14 lg:pb-0">
       {/* Hero */}
       <section className="relative h-72 sm:h-96">
         <Img src={pkg.image} alt={pkg.name} className="absolute inset-0" eager />
@@ -166,6 +167,20 @@ export default function PackageDetail() {
           </Card>
         </aside>
       </div>
+
+      {/* Mobile sticky booking bar */}
+      <MobileActionBar
+        sub={`${pkg.duration} · ${pkg.destination}, ${pkg.country}`}
+        price={
+          <p className="flex items-baseline gap-1">
+            <Price amount={pkg.price} className="text-xl font-bold text-slate-900" />
+            <span className="text-[11px] font-semibold text-slate-400">/ person</span>
+          </p>
+        }
+        buttonText="Book Package"
+        icon={<ArrowRight className="size-4" />}
+        onClick={book}
+      />
     </div>
   )
 }

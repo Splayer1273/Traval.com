@@ -78,16 +78,17 @@ export default function SearchWidget({ compact = false }) {
   const searchPackages = () => navigate('/packages')
 
   return (
-    <div className={cn('relative z-10 w-full rounded-3xl bg-white/95 p-3 shadow-lift backdrop-blur sm:p-4', compact && 'bg-white')}>
+    <div className={cn('relative z-10 w-full rounded-3xl shadow-lift', compact ? 'bg-white' : 'bg-gradient-to-r from-brand-200 via-sun-200 to-brand-200 p-px')}>
+      <div className={cn('rounded-[23px] p-3 sm:p-4', compact ? 'bg-white' : 'bg-white/95 backdrop-blur')}>
       <Tabs defaultValue="flights" onValueChange={(v) => {}}>
         <TabsList className="mb-3 w-full justify-start gap-1 overflow-x-auto bg-transparent p-0 sm:gap-2">
-          <TabsTrigger value="flights" className="data-[state=active]:bg-brand-600 data-[state=active]:text-white">
+          <TabsTrigger value="flights" className="px-3 data-[state=active]:bg-brand-600 data-[state=active]:text-white sm:px-4">
             <Plane className="size-4" /> Flights
           </TabsTrigger>
-          <TabsTrigger value="hotels" className="data-[state=active]:bg-brand-600 data-[state=active]:text-white">
+          <TabsTrigger value="hotels" className="px-3 data-[state=active]:bg-brand-600 data-[state=active]:text-white sm:px-4">
             <Hotel className="size-4" /> Hotels
           </TabsTrigger>
-          <TabsTrigger value="packages" className="data-[state=active]:bg-brand-600 data-[state=active]:text-white">
+          <TabsTrigger value="packages" className="px-3 data-[state=active]:bg-brand-600 data-[state=active]:text-white sm:px-4">
             <Briefcase className="size-4" /> Holiday Packages
           </TabsTrigger>
         </TabsList>
@@ -121,7 +122,7 @@ export default function SearchWidget({ compact = false }) {
               <button
                 type="button"
                 onClick={() => { setFrom(to); setTo(from) }}
-                className="absolute left-1/2 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-brand-600 p-1.5 text-white shadow-card transition-transform hover:rotate-180 lg:block"
+                className="absolute left-1/2 top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-brand-600 p-1.5 text-white shadow-card transition-transform hover:rotate-180 sm:block"
                 aria-label="Swap destinations"
               >
                 <ArrowLeftRight className="size-3.5" />
@@ -216,6 +217,7 @@ export default function SearchWidget({ compact = false }) {
           </div>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   )
 }

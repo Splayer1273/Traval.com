@@ -13,7 +13,7 @@ export default function Logo({ light = false, small = false }) {
           Project Sunrise
         </span>
         <span className={cn('block text-[10px] font-semibold uppercase tracking-[0.22em]', light ? 'text-slate-300' : 'text-sun-600')}>
-          Travel & Explore
+          Corporate Travel
         </span>
       </span>
     </Link>

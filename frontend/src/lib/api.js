@@ -24,8 +24,18 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
+    // A 401 on a request that carried a token means the session is stale or
+    // expired — clear it so the app stops hammering protected endpoints and
+    // let AuthContext drop the in-memory user (→ redirect to /login).
+    if (err?.response?.status === 401 && err?.config?.headers?.Authorization) {
+      localStorage.removeItem('sunrise_token')
+      localStorage.removeItem('sunrise_user')
+      window.dispatchEvent(new Event('auth:unauthorized'))
+    }
     const message = err?.response?.data?.message || err.message || 'Something went wrong'
-    return Promise.reject(new Error(message))
+    const error = new Error(message)
+    error.status = err?.response?.status
+    return Promise.reject(error)
   },
 )
 

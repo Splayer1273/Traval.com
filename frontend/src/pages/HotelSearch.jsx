@@ -10,9 +10,13 @@ import { Skeleton } from '../components/ui/skeleton.jsx'
 import { Button } from '../components/ui/button.jsx'
 import { Checkbox } from '../components/ui/checkbox.jsx'
 import { Slider } from '../components/ui/slider.jsx'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../components/ui/sheet.jsx'
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '../components/ui/sheet.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select.jsx'
 import { hotelApi } from '../services/hotelApi.js'
+import { useTravel } from '../context/TravelContext.jsx'
+import { Briefcase, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { formatDate } from '../utils/format.js'
 
 const SORTS = [
   { id: 'recommended', label: 'Recommended' },
@@ -26,6 +30,7 @@ const AMENITIES = ['Free WiFi', 'Swimming Pool', 'Spa', 'Breakfast', 'Airport Sh
 
 export default function HotelSearch() {
   const [params] = useSearchParams()
+  const { draft: travelDraft } = useTravel()
   const [sort, setSort] = useState('recommended')
   const [filtersOpen, setFiltersOpen] = useState(false)
 
@@ -93,23 +98,24 @@ export default function HotelSearch() {
 
   const toggle = (arr, setArr, v) => setArr(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v])
 
-  const FilterPanel = (
+  const resetFilters = () => {
+    setPriceRange([0, 100000]); setStars([]); setMinRating(0); setAmenities([]); setPropertyTypes([])
+    setFreeCancel(false); setBreakfast(false); setLocations([])
+  }
+
+  const FilterHeader = (
+    <div className="flex items-center justify-between gap-3">
+      <h3 className="flex items-center gap-2 font-display text-base font-semibold text-slate-900">
+        <SlidersHorizontal className="size-4 text-brand-600" /> Filters
+      </h3>
+      <button type="button" className="shrink-0 text-xs font-semibold text-brand-600 hover:underline" onClick={resetFilters}>
+        Reset all
+      </button>
+    </div>
+  )
+
+  const FilterBody = (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="flex items-center gap-2 font-display text-base font-semibold text-slate-900">
-          <SlidersHorizontal className="size-4 text-brand-600" /> Filters
-        </h3>
-        <button
-          type="button"
-          className="text-xs font-semibold text-brand-600 hover:underline"
-          onClick={() => {
-            setPriceRange([0, 100000]); setStars([]); setMinRating(0); setAmenities([]); setPropertyTypes([])
-            setFreeCancel(false); setBreakfast(false); setLocations([])
-          }}
-        >
-          Reset all
-        </button>
-      </div>
 
       <div className="space-y-3">
         <p className="text-sm font-semibold text-slate-700">Price per night</p>
@@ -197,8 +203,9 @@ export default function HotelSearch() {
       />
 
       <div className="container-x -mt-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="rounded-2xl bg-gradient-to-r from-brand-200 via-sun-200 to-brand-200 p-px shadow-lift">
+          <div className="rounded-[15px] bg-white p-4">
+            <div className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-52">
               <MapPin className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
               <input
@@ -213,8 +220,23 @@ export default function HotelSearch() {
               {params.get('guests') && <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold">{params.get('guests')} guests</span>}
             </div>
           </div>
+          </div>
         </div>
       </div>
+
+      {/* Corporate trip context banner */}
+      {params.get('corp') === '1' && travelDraft?.trip && (
+        <div className="container-x mt-6">
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-brand-200 bg-brand-50/60 p-4">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-brand-600 text-white"><Briefcase className="size-4" /></span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-slate-800">Business trip: {travelDraft.trip.title} · {travelDraft.trip.destination}</p>
+              <p className="text-xs text-slate-500">{formatDate(travelDraft.trip.startDate)} – {formatDate(travelDraft.trip.endDate)} · hotels checked against your nightly limit.</p>
+            </div>
+            <Link to="/trips/review" className="inline-flex items-center gap-1 text-xs font-bold text-brand-700 hover:underline">Review <ArrowRight className="size-3" /></Link>
+          </div>
+        </div>
+      )}
 
       <div className="container-x mt-8">
         {isLoading ? (
@@ -234,11 +256,12 @@ export default function HotelSearch() {
         ) : isError ? (
           <ErrorState message="We couldn't load hotels right now." onRetry={refetch} />
         ) : filtered.length === 0 ? (
-          <EmptyState title="No hotels match your filters" text="Try widening your price range or clearing some filters." action={<Button variant="secondary" onClick={() => { setPriceRange([0, 100000]); setStars([]); setMinRating(0); setAmenities([]); setPropertyTypes([]); setFreeCancel(false); setBreakfast(false); setLocations([]) }}>Clear all filters</Button>} />
+          <EmptyState title="No hotels match your filters" text="Try widening your price range or clearing some filters." action={<Button variant="secondary" onClick={resetFilters}>Clear all filters</Button>} />
         ) : (
           <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
             <aside className="sticky top-24 hidden h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-card lg:block">
-              {FilterPanel}
+              <div className="mb-6">{FilterHeader}</div>
+              {FilterBody}
             </aside>
             <div>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -251,10 +274,25 @@ export default function HotelSearch() {
                     <SheetTrigger asChild>
                       <Button variant="secondary" className="lg:hidden"><Filter className="size-4" /> Filters</Button>
                     </SheetTrigger>
-                    <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-3xl">
-                      <SheetHeader><SheetTitle>Filter hotels</SheetTitle></SheetHeader>
-                      {FilterPanel}
-                      <Button className="mt-4 w-full" onClick={() => setFiltersOpen(false)}>Show {filtered.length} hotels</Button>
+                    <SheetContent side="bottom" className="inset-0 max-h-none rounded-none! border-0! p-0">
+                      <div className="flex h-full flex-col">
+                        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 pr-14">
+                          <SheetTitle className="flex items-center gap-2 font-display text-lg">
+                            <SlidersHorizontal className="size-5 text-brand-600" /> Filter hotels
+                          </SheetTitle>
+                          <button type="button" className="shrink-0 text-xs font-bold text-brand-600 hover:underline" onClick={resetFilters}>
+                            Reset all
+                          </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto px-5 py-5">
+                          {FilterBody}
+                        </div>
+                        <div className="border-t border-slate-100 bg-white px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4">
+                          <Button size="lg" className="w-full" onClick={() => setFiltersOpen(false)}>
+                            Show {filtered.length} propert{filtered.length !== 1 ? 'ies' : 'y'}
+                          </Button>
+                        </div>
+                      </div>
                     </SheetContent>
                   </Sheet>
                   <Select value={sort} onValueChange={setSort}>

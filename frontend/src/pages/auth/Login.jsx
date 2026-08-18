@@ -20,8 +20,8 @@ export default function Login() {
   const doLogin = async (email = form.email, password = form.password) => {
     try {
       await login({ email, password })
-      success('Welcome back! Happy travels.', 'Signed in')
-      navigate('/account')
+      success('Signed in to the corporate portal.', 'Welcome back')
+      navigate('/')
     } catch (e) {
       error(e.message, 'Sign in failed')
     }
@@ -29,33 +29,47 @@ export default function Login() {
 
   return (
     <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to manage bookings, saved trips and more."
+      title="Sign in to your workspace"
+      subtitle="Corporate travel management for Acme Technologies — book business trips, follow policy and track approvals."
       footer={
         <>
-          New to Project Sunrise?{' '}
-          <Link to="/register" className="font-semibold text-brand-600 hover:underline">Create an account</Link>
+          New to the corporate portal?{' '}
+          <Link to="/register" className="font-semibold text-brand-600 hover:underline">Request an account</Link>
         </>
       }
     >
       <div className="space-y-5">
         {/* Demo accounts */}
         <div className="rounded-2xl border border-brand-100 bg-brand-50/60 p-4">
-          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-700">Demo accounts</p>
-          <div className="grid grid-cols-2 gap-2">
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-700">Demo accounts · password: Password@123</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <button
               type="button"
-              onClick={() => doLogin('demo@sunrise.travel', 'demo1234')}
+              onClick={() => doLogin('rahul@acme.com', 'Password@123')}
               className="rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-xs font-bold text-brand-700 transition-colors hover:bg-brand-100"
             >
-              ✈️ Traveller demo
+              🧑‍💻 Employee
             </button>
             <button
               type="button"
-              onClick={() => doLogin('any@email.com', 'password123')}
+              onClick={() => doLogin('amit@acme.com', 'Password@123')}
               className="rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-xs font-bold text-brand-700 transition-colors hover:bg-brand-100"
             >
-              🔑 Any email works
+              🛂 Approver
+            </button>
+            <button
+              type="button"
+              onClick={() => doLogin('finance@acme.com', 'Password@123')}
+              className="rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-xs font-bold text-brand-700 transition-colors hover:bg-brand-100"
+            >
+              💰 Finance
+            </button>
+            <button
+              type="button"
+              onClick={() => doLogin('admin@acme.com', 'Password@123')}
+              className="rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-xs font-bold text-brand-700 transition-colors hover:bg-brand-100"
+            >
+              🛡️ Admin
             </button>
           </div>
         </div>
@@ -71,8 +85,8 @@ export default function Login() {
           className="space-y-4"
         >
           <div>
-            <Label htmlFor="email">Email address</Label>
-            <Input id="email" type="email" className="mt-1.5" placeholder="you@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+            <Label htmlFor="email">Work email address</Label>
+            <Input id="email" type="email" className="mt-1.5" placeholder="rahul@acme.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
           </div>
           <div>
             <div className="flex items-center justify-between">

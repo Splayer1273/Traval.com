@@ -46,8 +46,8 @@ export default function Register() {
     if (score < 2) return error('Please choose a stronger password.', 'Almost there')
     try {
       await register(form)
-      success('Your account is ready. Welcome to Project Sunrise!', 'Account created')
-      navigate('/account')
+      success('Your corporate account is ready. Welcome aboard!', 'Account created')
+      navigate('/')
     } catch (err) {
       error(err.message, 'Registration failed')
     }
@@ -55,11 +55,11 @@ export default function Register() {
 
   return (
     <AuthLayout
-      title="Create your account"
-      subtitle="Join Project Sunrise for faster checkout, price alerts and member deals."
+      title="Request a corporate account"
+      subtitle="Your administrator provisions travel access — sign in with your work email once your account is active."
       footer={
         <>
-          Already have an account?{' '}
+          Already have a corporate account?{' '}
           <Link to="/login" className="font-semibold text-brand-600 hover:underline">Sign in</Link>
         </>
       }

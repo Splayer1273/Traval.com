@@ -26,6 +26,16 @@ const userSchema = new mongoose.Schema(
     company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', default: null },
     title: { type: String, trim: true, default: '' },
     phone: { type: String, trim: true, default: '' },
+    // Corporate profile fields used by the travel portal
+    employeeId: { type: String, trim: true, default: '' },
+    designation: { type: String, trim: true, default: '' },
+    grade: { type: String, trim: true, default: '' },
+    department: { type: String, trim: true, default: '' },
+    manager: { type: String, trim: true, default: '' },
+    managerEmail: { type: String, trim: true, default: '' },
+    costCenter: { type: String, trim: true, default: '' },
+    projectCode: { type: String, trim: true, default: '' },
+    location: { type: String, trim: true, default: '' },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

@@ -1,73 +1,74 @@
-import { api, delay } from '../lib/api.js'
-import { DEMO_USER } from '../data/users.js'
+import { api } from '../lib/api.js'
 
 /**
- * Auth service.
+ * Auth service — now wired to the real Express/Mongoose API.
  *
- * Mock implementation used today; swap `mockLogin` etc. for the real calls
- * (commented below) once the backend is wired in — nothing else changes.
+ * Backend roles (employee / manager / finance / admin) map to the portal's
+ * frontend roles (employee / approver / finance / admin): manager → approver,
+ * finance → finance, admin → admin, everything else → employee.
  */
 
-const MOCK_DELAY = 700
-
-async function mockLogin({ email, password }) {
-  await delay(MOCK_DELAY)
-  if (!email || !password) throw new Error('Please enter your email and password.')
-  const normalized = email.toLowerCase()
-  if (normalized === 'demo@sunrise.travel') {
-    return {
-      user: { ...DEMO_USER, email },
-      token: 'demo_token_sunrise',
-    }
-  }
-  // Any valid-looking account can sign in for the demo.
-  if (!/^\S+@\S+\.\S+$/.test(normalized)) throw new Error('That email address does not look valid.')
-  if (password.length < 6) throw new Error('Password must be at least 6 characters.')
+function mapUser(u) {
+  if (!u) return null
+  const names = (u.name || '').split(' ')
   return {
-    user: { ...DEMO_USER, email, firstName: normalized.split('@')[0] },
-    token: 'demo_token_sunrise',
-  }
-}
-
-async function mockRegister({ firstName, lastName, email, phone, password }) {
-  await delay(MOCK_DELAY)
-  if (!/^\S+@\S+\.\S+$/.test(email || '')) throw new Error('Please enter a valid email address.')
-  if ((password || '').length < 8) throw new Error('Password must be at least 8 characters.')
-  return {
-    user: { ...DEMO_USER, firstName, lastName, email, phone },
-    token: 'demo_token_sunrise',
+    id: u.id,
+    firstName: names[0] || (u.email || '').split('@')[0] || 'User',
+    lastName: names.slice(1).join(' '),
+    email: u.email,
+    phone: u.phone || '',
+    role: u.role === 'manager' ? 'approver' : u.role === 'finance' ? 'finance' : u.role === 'admin' ? 'admin' : 'employee',
+    title: u.title || '',
+    company: u.company || '',
+    employeeId: u.employeeId || '',
+    designation: u.designation || '',
+    grade: u.grade || '',
+    department: u.department || '',
+    manager: u.manager || '',
+    managerEmail: u.managerEmail || '',
+    costCenter: u.costCenter || '',
+    projectCode: u.projectCode || '',
+    location: u.location || '',
+    isCorporate: true,
+    avatar: null,
+    memberSince: u.createdAt ? String(u.createdAt).slice(0, 10) : new Date().toISOString().slice(0, 10),
+    preferences: { currency: 'INR', language: 'en' },
   }
 }
 
 export const authApi = {
   async login(payload) {
-    // Real: return (await api.post('/auth/login', payload)).data
-    return mockLogin(payload)
+    const res = await api.post('/auth/login', payload)
+    return { user: mapUser(res.data.user), token: res.data.token }
   },
   async register(payload) {
-    // Real: return (await api.post('/auth/register', payload)).data
-    return mockRegister(payload)
+    const res = await api.post('/auth/register', {
+      name: `${payload.firstName || ''} ${payload.lastName || ''}`.trim(),
+      email: payload.email,
+      password: payload.password,
+    })
+    return { user: mapUser(res.data.user), token: res.data.token }
   },
   async me() {
-    // Real: return (await api.get('/auth/me')).data
-    await delay(200)
-    return DEMO_USER
+    const res = await api.get('/auth/me')
+    return mapUser(res.data.user)
   },
   async forgotPassword(email) {
-    // Real: return (await api.post('/auth/forgot-password', { email })).data
-    await delay(MOCK_DELAY)
+    // No backend endpoint yet — keep the demo behaviour.
     if (!/^\S+@\S+\.\S+$/.test(email || '')) throw new Error('Please enter a valid email address.')
     return { success: true }
   },
   async resetPassword({ token, password }) {
-    // Real: return (await api.post('/auth/reset-password', { token, password })).data
-    await delay(MOCK_DELAY)
+    // No backend endpoint yet — keep the demo behaviour.
     if ((password || '').length < 8) throw new Error('Password must be at least 8 characters.')
     return { success: true }
   },
   async logout() {
-    // Real: return (await api.post('/auth/logout')).data
-    await delay(150)
+    try {
+      await api.post('/auth/logout')
+    } catch {
+      // Token may already be invalid — sign out locally regardless.
+    }
     return { success: true }
   },
 }

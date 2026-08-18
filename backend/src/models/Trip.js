@@ -12,7 +12,7 @@ const tripSchema = new mongoose.Schema(
     actualCost: { type: Number, default: 0, min: 0 },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'cancelled', 'completed'],
+      enum: ['pending', 'approved', 'rejected', 'ticketed', 'cancelled', 'completed'],
       default: 'pending',
     },
     approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
@@ -26,6 +26,25 @@ const tripSchema = new mongoose.Schema(
         date: { type: Date, default: Date.now },
       },
     ],
+    // --- Corporate travel portal fields ---
+    ref: { type: String, trim: true, default: '' },
+    title: { type: String, trim: true, default: '' },
+    from: { type: String, trim: true, default: '' },
+    client: { type: String, trim: true, default: '' },
+    project: { type: String, trim: true, default: '' },
+    costCenter: { type: String, trim: true, default: '' },
+    travellers: { type: Number, default: 1, min: 1 },
+    estimatedCost: { type: Number, default: 0, min: 0 },
+    approver: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    flight: { type: mongoose.Schema.Types.Mixed, default: null },
+    hotel: { type: mongoose.Schema.Types.Mixed, default: null },
+    policy: {
+      type: mongoose.Schema.Types.Mixed,
+      default: { flight: 'none', hotel: 'none', violation: false },
+    },
+    timeline: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    cancelledBy: { type: String, trim: true, default: '' },
+    cancelReason: { type: String, trim: true, default: '' },
   },
   { timestamps: true }
 );
