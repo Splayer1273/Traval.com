@@ -71,4 +71,8 @@ export const authApi = {
     }
     return { success: true }
   },
+  async googleLogin(credential) {
+    const res = await api.post('/auth/google', { credential })
+    return { user: mapUser(res.data.user), token: res.data.token }
+  },
 }

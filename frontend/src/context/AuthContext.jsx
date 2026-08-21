@@ -88,6 +88,19 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  const googleLogin = useCallback(async (credential) => {
+    setLoading(true)
+    try {
+      const { user: u, token } = await authApi.googleLogin(credential)
+      localStorage.setItem(TOKEN_KEY, token)
+      setSessionChecked(true)
+      setUser(u)
+      return u
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   const logout = useCallback(async () => {
     try {
       await authApi.logout()
@@ -115,10 +128,11 @@ export function AuthProvider({ children }) {
       sessionChecked,
       login,
       register,
+      googleLogin,
       logout,
       updateUser,
     }
-  }, [user, loading, sessionChecked, login, register, logout, updateUser])
+  }, [user, loading, sessionChecked, login, register, googleLogin, logout, updateUser])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

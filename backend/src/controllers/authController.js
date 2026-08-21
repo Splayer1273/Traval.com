@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
 import User from '../models/User.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/AppError.js';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
@@ -74,6 +77,49 @@ export const login = asyncHandler(async (req, res) => {
 export const getMe = asyncHandler(async (req, res) => {
   if (req.user.company) await req.user.populate('company', 'name');
   res.json({ success: true, user: publicUser(req.user) });
+});
+
+/**
+ * POST /api/auth/google
+ */
+export const googleLogin = asyncHandler(async (req, res) => {
+  const { credential } = req.body;
+  if (!credential) throw new AppError('Google credential is required', 400);
+
+  let payload;
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    payload = ticket.getPayload();
+  } catch {
+    throw new AppError('Invalid Google credential', 401);
+  }
+
+  const { sub: googleId, email, name, picture } = payload;
+
+  // Find existing user by Google ID or email
+  let user = await User.findOne({ $or: [{ googleId }, { email }] });
+
+  if (user) {
+    // Link Google account if user signed up with email/password
+    if (!user.googleId) {
+      user.googleId = googleId;
+      await user.save();
+    }
+  } else {
+    // Create a new user from Google profile
+    user = await User.create({
+      name: name || email.split('@')[0],
+      email,
+      googleId,
+      role: 'employee',
+    });
+  }
+
+  if (user.company) await user.populate('company', 'name');
+  res.json({ success: true, token: signToken(user._id), user: publicUser(user) });
 });
 
 /**
