@@ -7,8 +7,28 @@ import { notFound, errorHandler } from '../src/middleware/error.js';
 
 const app = express();
 
-// ----- Global middleware -----
-app.use(cors({ origin: process.env.CLIENT_URL || '*', credentials: true }));
+// ----- CORS -----
+// Allow the production frontend URL (CLIENT_URL) and local dev.
+// Cannot use '*' with credentials — browsers reject it.
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:3000',
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Allow requests with no origin (server-to-server, curl, same-origin)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

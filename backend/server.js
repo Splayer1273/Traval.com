@@ -7,8 +7,25 @@ import { notFound, errorHandler } from './src/middleware/error.js';
 
 const app = express();
 
-// ----- Global middleware -----
-app.use(cors({ origin: process.env.CLIENT_URL || '*', credentials: true }));
+// ----- CORS -----
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:3000',
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
