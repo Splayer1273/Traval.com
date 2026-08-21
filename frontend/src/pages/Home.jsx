@@ -1,22 +1,48 @@
-import { useState } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import {
   ArrowRight, Banknote, Briefcase, Building2, CalendarDays, CheckCircle2, ClipboardList,
   Clock, Hotel, MapPin, Plane, Receipt, ShieldCheck, Sparkles, Users, Wallet, XCircle,
+  Star, Globe, Zap, TrendingUp, Award, Headphones, Smartphone, CreditCard, PieChart,
+  Route, Luggage, Search, Settings, Target, BadgeCheck, ThumbsUp, Handshake, Crown,
+  FileCheck, Car, Map, BarChart3, ChevronRight,
 } from 'lucide-react'
 import { Badge } from '../components/ui/badge.jsx'
 import { Button } from '../components/ui/button.jsx'
 import { Card, CardContent } from '../components/ui/card.jsx'
 import { Skeleton } from '../components/ui/skeleton.jsx'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select.jsx'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion.jsx'
 import { Price } from '../components/Price.jsx'
 import { corporateApi, computeStats } from '../services/corporateApi.js'
 import { AIRPORTS } from '../data/airports.js'
 import { requestStatusMeta, claimStatusMeta } from '../data/corporate.js'
+import {
+  CHALLENGES, SOLUTION_STEPS, TRUST_STATS, SERVICES, PLATFORM_FEATURES,
+  HOW_IT_WORKS, TEAM_SOLUTIONS, GLOBAL_STATS, WHY_CHOOSE, TESTIMONIALS,
+  LANDING_FAQS,
+} from '../data/landingPage.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { formatDate, todayISO } from '../utils/format.js'
 import { cn } from '../lib/utils.js'
+import { AnimateOnScroll, StaggerContainer, StaggerItem, AnimatedCounter, ParallaxBackground, TiltCard, MagneticButton } from '../components/animations/index.js'
+import Img from '../components/Img.jsx'
+import {
+  CinematicBreak, DualPanelBreak, TrioBreak, QuadStripBreak,
+  AsymmetricGridBreak, ParallaxBreak, EditorialBreak, BREAK_IMAGES,
+} from '../components/ContentImageBreak.jsx'
+import {
+  HeroBg, ChallengeBg, SolutionBg, TrustBg, ServicesBg,
+  PlatformBg, HowItWorksBg, SolutionsBg, GlobalNetworkBg,
+  WhyChooseBg, TestimonialsBg, MobileBg, FaqBg, FinalCtaBg,
+} from '../components/LandingBackground.jsx'
+import {
+  HeroCinematicBg, GlobalCinematicBg, CtaCinematicBg,
+  ServicesCinematicBg, TrustCinematicBg, PlatformCinematicBg,
+  SolutionsCinematicBg, HowItWorksCinematicBg,
+} from '../components/CinematicBackground.jsx'
 
 function greeting() {
   const h = new Date().getHours()
@@ -25,129 +51,830 @@ function greeting() {
   return 'Good evening'
 }
 
-/* ---------------------------------- Guest landing ---------------------------------- */
+/* ── Floating animated particles for hero ── */
+function FloatingParticles() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {[...Array(20)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute size-1 rounded-full bg-white/20"
+          initial={{ x: Math.random() * 1200, y: Math.random() * 600, opacity: 0 }}
+          animate={{
+            y: [Math.random() * 600, Math.random() * 600],
+            opacity: [0, 0.6, 0],
+          }}
+          transition={{ duration: 4 + Math.random() * 6, repeat: Infinity, delay: Math.random() * 5, ease: 'easeInOut' }}
+        />
+      ))}
+    </div>
+  )
+}
+
+/* ── Animated route lines for hero globe feel ── */
+function AnimatedRoutes() {
+  return (
+    <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 1200 600" fill="none">
+      <motion.path
+        d="M100,400 Q300,100 600,300 T1100,200"
+        stroke="url(#route-gradient)"
+        strokeWidth="1.5"
+        strokeDasharray="8 6"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.4 }}
+        transition={{ duration: 3, delay: 1, ease: 'easeInOut' }}
+      />
+      <motion.path
+        d="M200,500 Q500,150 800,350 T1150,350"
+        stroke="url(#route-gradient)"
+        strokeWidth="1"
+        strokeDasharray="4 8"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.25 }}
+        transition={{ duration: 3.5, delay: 1.5, ease: 'easeInOut' }}
+      />
+      {/* Glowing dots at key points */}
+      {[
+        { cx: 600, cy: 300 },
+        { cx: 300, cy: 200 },
+        { cx: 900, cy: 250 },
+      ].map((pt, i) => (
+        <motion.circle
+          key={i}
+          cx={pt.cx}
+          cy={pt.cy}
+          r="4"
+          fill="#3b5bff"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: [0, 1, 0.5, 1], scale: 1 }}
+          transition={{ duration: 2, delay: 2 + i * 0.5, repeat: Infinity, repeatType: 'reverse' }}
+        />
+      ))}
+      <defs>
+        <linearGradient id="route-gradient" x1="0" y1="0" x2="1200" y2="0">
+          <stop offset="0%" stopColor="#3b5bff" stopOpacity="0.1" />
+          <stop offset="50%" stopColor="#f97316" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#3b5bff" stopOpacity="0.1" />
+        </linearGradient>
+      </defs>
+    </svg>
+  )
+}
+
+/* ── Animated stat number ── */
+function AnimatedStatNumber({ value, className = '' }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, amount: 0.5 })
+  const numericPart = value.replace(/[^0-9]/g, '')
+  const suffix = value.replace(/[0-9]/g, '')
+  const [displayed, setDisplayed] = useState('0')
+
+  useEffect(() => {
+    if (!isInView || !numericPart) return
+    const target = parseInt(numericPart, 10)
+    if (isNaN(target)) { setDisplayed(value); return }
+    let current = 0
+    const step = Math.max(1, Math.floor(target / 40))
+    const timer = setInterval(() => {
+      current = Math.min(current + step, target)
+      setDisplayed(String(current))
+      if (current >= target) clearInterval(timer)
+    }, 35)
+    return () => clearInterval(timer)
+  }, [isInView, numericPart, value])
+
+  return <span ref={ref} className={className}>{displayed}{suffix}</span>
+}
+
+/* ======================================== Guest Landing ======================================== */
 
 function GuestLanding() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ from: 'BOM', to: 'BLR', date: todayISO(14), returnDate: todayISO(17) })
-
-  const searchFlight = (e) => {
-    e.preventDefault()
-    navigate(`/flights?trip=roundtrip&from=${form.from}&to=${form.to}&date=${form.date}&return=${form.returnDate}&cabin=Economy&corp=1`)
-  }
-  const searchHotel = () => navigate(`/hotels?destination=${AIRPORTS.find((a) => a.code === form.to)?.city || form.to}&checkIn=${form.date}&checkOut=${form.returnDate}&corp=1`)
-
-  const FEATURES = [
-    { icon: ShieldCheck, title: 'Policy-compliant booking', text: 'Every flight & hotel is checked against your company travel policy before you book.' },
-    { icon: ClipboardList, title: 'Built-in approval workflow', text: 'Requests flow to your manager with purpose, cost and policy status attached.' },
-    { icon: Wallet, title: 'Controlled company spend', text: 'Designation-based limits, budgets and a live view of estimated travel spend.' },
-    { icon: Building2, title: 'Enterprise travel console', text: 'Admin dashboards for policies, employees, approvals and spend analytics.' },
-  ]
+  const heroRef = useRef(null)
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120])
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08])
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-slate-950">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-950 via-slate-950 to-slate-900" />
-        <div className="pointer-events-none absolute -left-24 top-8 size-80 rounded-full bg-brand-500/25 blur-3xl" />
-        <div className="pointer-events-none absolute -right-20 top-1/3 size-96 rounded-full bg-sun-500/15 blur-3xl" />
-        <div className="container-x relative flex min-h-[520px] flex-col justify-center py-16">
-          <div className="mx-auto w-full max-w-3xl text-center text-white">
-            <p className="mb-4 inline-flex animate-fade-up items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest backdrop-blur">
-              <Building2 className="size-3.5 text-sun-400" /> Corporate Travel Management · Acme Technologies
+      {/* ════════════════════════════════ HERO ════════════════════════════════ */}
+      <section ref={heroRef} className="relative min-h-[680px] overflow-hidden bg-slate-950">
+        <HeroCinematicBg />
+
+        {/* Animated route lines */}
+        <AnimatedRoutes />
+
+        {/* Floating particles */}
+        <FloatingParticles />
+
+        {/* Hero content with parallax */}
+        <motion.div style={{ y: heroY, opacity: heroOpacity, scale: heroScale }} className="container-x relative flex min-h-[680px] flex-col justify-center py-20">
+          <div className="mx-auto w-full max-w-4xl text-center text-white">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-200 backdrop-blur-sm">
+                <Globe className="size-3.5" /> Premium Corporate Travel Platform
+              </span>
+            </motion.div>
+
+            <motion.h1
+              className="font-display text-4xl font-semibold leading-[1.15] sm:text-5xl lg:text-6xl"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              Business Travel,<br />
+              <span className="bg-gradient-to-r from-brand-400 via-brand-300 to-sun-400 bg-clip-text text-transparent">Managed Smarter.</span>
+            </motion.h1>
+
+            <motion.p
+              className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-300"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3, ease: 'easeOut' }}
+            >
+              One connected platform for booking, approvals, expenses and end-to-end corporate travel management.
+            </motion.p>
+
+            <motion.p
+              className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-400"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
+            >
+              Akbar Bizvoy helps businesses simplify the way they plan, manage and control corporate travel. From flights and accommodation to visas, transportation, MICE and travel expenses, we bring essential business travel services together with technology and professional support.
+            </motion.p>
+
+            <motion.div
+              className="mt-10 flex flex-wrap items-center justify-center gap-4"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.5, ease: 'easeOut' }}
+            >
+              <MagneticButton
+                onClick={() => navigate('/register')}
+                className="flex h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-7 text-sm font-bold text-white shadow-glow transition-all hover:from-brand-600 hover:to-brand-700"
+              >
+                Request a Demo
+              </MagneticButton>
+              <MagneticButton
+                onClick={() => navigate('/about')}
+                className="flex h-12 items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-7 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10"
+              >
+                Explore Solutions <ArrowRight className="size-4" />
+              </MagneticButton>
+            </motion.div>
+
+            <motion.div
+              className="mt-10 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+            >
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="size-3.5 text-emerald-400" /> 45+ years of travel experience</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="size-3.5 text-emerald-400" /> 300+ offices worldwide</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="size-3.5 text-emerald-400" /> 100+ countries</span>
+            </motion.div>
+          </div>
+
+          {/* Scroll indicator */}
+          <motion.div
+            className="absolute bottom-8 left-1/2 -translate-x-1/2"
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <div className="flex flex-col items-center gap-1.5">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Scroll to explore</span>
+              <div className="flex h-8 w-5 items-start justify-center rounded-full border border-slate-600 p-1">
+                <motion.div
+                  className="size-1.5 rounded-full bg-brand-400"
+                  animate={{ y: [0, 12, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ─── Image Break: Cinematic airport panorama ─── */}
+      <CinematicBreak
+        images={BREAK_IMAGES.heroBreak}
+        caption="Akbar Bizvoy — Where Business Meets the World"
+        captionSub="Premium corporate travel, powered by 45+ years of expertise"
+      />
+
+      {/* ════════════════════════════ CHALLENGE ════════════════════════════ */}
+      <section className="relative overflow-hidden py-20">
+        <ChallengeBg />
+        <div className="container-x relative">
+        <AnimateOnScroll preset="fadeUp">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">The Problem</span>
+            <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+              Corporate Travel Shouldn't Be Complicated
+            </h2>
+            <p className="mt-4 text-base text-slate-500">
+              Managing business travel across employees, departments and destinations can involve multiple bookings, approval processes, travel policies, expenses and service providers. Akbar Bizvoy brings these activities together.
             </p>
-            <h1 className="animate-fade-up font-display text-4xl font-semibold leading-tight sm:text-5xl" style={{ animationDelay: '80ms' }}>
-              Manage your business travel.
-              <br />
-              <span className="text-gradient">Policy-first. Approval-ready.</span>
-            </h1>
-            <p className="mx-auto mt-5 max-w-xl animate-fade-up text-base text-slate-300" style={{ animationDelay: '160ms' }}>
-              Book flights and hotels for official trips, stay within company policy and let your manager approve in a few clicks.
+          </div>
+        </AnimateOnScroll>
+        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" staggerDelay={0.08}>
+          {CHALLENGES.map((c) => (
+            <StaggerItem key={c.title}>
+              <TiltCard maxTilt={4} scale={1.015}>
+                <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
+                  <CardContent className="p-6">
+                    <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-50 to-sun-50 text-brand-600">
+                      <c.icon className="size-5" />
+                    </span>
+                    <h3 className="mt-4 font-display text-base font-semibold text-slate-900">{c.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-500">{c.text}</p>
+                  </CardContent>
+                </Card>
+              </TiltCard>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Corporate workspace duality ─── */}
+      <DualPanelBreak
+        images={BREAK_IMAGES.challengeBreak}
+        captions={['Modern business workspace', 'Strategic planning & coordination']}
+      />
+
+      {/* ════════════════════════════ SOLUTION ════════════════════════════ */}
+      <section className="relative overflow-hidden bg-slate-50 py-20">
+        <SolutionBg />
+        <div className="container-x relative">
+          <AnimateOnScroll preset="fadeUp">
+            <div className="mx-auto max-w-3xl text-center">
+              <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">The Solution</span>
+              <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+                One Travel Ecosystem. From Planning to Expense.
+              </h2>
+              <p className="mt-4 text-base text-slate-500">
+                Akbar Bizvoy combines corporate travel services, technology and professional travel support into one connected solution.
+              </p>
+            </div>
+          </AnimateOnScroll>
+          <StaggerContainer className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5" staggerDelay={0.1}>
+            {SOLUTION_STEPS.map((s, i) => (
+              <StaggerItem key={s.label}>
+                <div className="relative">
+                  <TiltCard maxTilt={5} scale={1.02}>
+                    <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
+                      <CardContent className="flex flex-col items-center p-6 text-center">
+                        <motion.span
+                          className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow"
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          transition={{ type: 'spring', stiffness: 300 }}
+                        >
+                          <s.icon className="size-6" />
+                        </motion.span>
+                        <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-brand-400">Step {i + 1}</p>
+                        <h3 className="mt-1 font-display text-lg font-semibold text-slate-900">{s.label}</h3>
+                        <p className="mt-2 text-sm text-slate-500">{s.description}</p>
+                      </CardContent>
+                    </Card>
+                  </TiltCard>
+                  {i < SOLUTION_STEPS.length - 1 && (
+                    <div className="pointer-events-none absolute right-0 top-1/2 hidden -translate-y-1/2 text-slate-300 lg:block">
+                      <motion.div animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                        <ArrowRight className="size-5" />
+                      </motion.div>
+                    </div>
+                  )}
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+          <div className="mt-12 text-center">
+            <MagneticButton
+              onClick={() => document.getElementById('platform')?.scrollIntoView({ behavior: 'smooth' })}
+              className="inline-flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 text-sm font-bold text-slate-700 shadow-soft transition-all hover:border-brand-300 hover:shadow-lift"
+            >
+              See How It Works <ArrowRight className="size-4" />
+            </MagneticButton>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Tech platform editorial ─── */}
+      <EditorialBreak
+        src={BREAK_IMAGES.solutionBreak}
+        alt="Data analytics dashboard"
+        caption="Technology that transforms how your business travels"
+        captionDetail="From smart booking to real-time analytics, our platform gives finance leaders, travel coordinators and employees the visibility and control they need — all in one place."
+      />
+
+      {/* ════════════════════════════ TRUST STATS ════════════════════════════ */}
+      <section className="relative overflow-hidden py-20">
+        <TrustCinematicBg />
+        <div className="container-x relative">
+        <AnimateOnScroll preset="fadeUp">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">Our Track Record</span>
+            <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+              Built on Experience. Designed for Modern Business.
+            </h2>
+          </div>
+        </AnimateOnScroll>
+        <StaggerContainer className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4" staggerDelay={0.12}>
+          {TRUST_STATS.map((s) => (
+            <StaggerItem key={s.label}>
+              <TiltCard maxTilt={3} scale={1.02}>
+                <Card className="text-center transition-all hover:-translate-y-1 hover:shadow-lift">
+                  <CardContent className="p-7">
+                    <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow">
+                      <AnimatedStatNumber value={s.value} className="font-display text-2xl font-bold" />
+                    </div>
+                    <p className="mt-4 text-sm font-medium text-slate-600">{s.label}</p>
+                  </CardContent>
+                </Card>
+              </TiltCard>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+        <AnimateOnScroll preset="fadeUp" delay={0.3}>
+          <p className="mx-auto mt-10 max-w-3xl text-center text-sm leading-relaxed text-slate-500">
+            Akbar Bizvoy combines decades of travel expertise with modern technology to help businesses manage corporate travel more efficiently.
+          </p>
+        </AnimateOnScroll>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Airport terminal panorama ─── */}
+      <CinematicBreak
+        images={BREAK_IMAGES.trustBreak}
+        height='h-[250px] sm:h-[320px] lg:h-[380px]'
+        caption="Trusted by businesses across 100+ countries"
+      />
+
+      {/* ════════════════════════════ SERVICES ════════════════════════════ */}
+      <section id="services" className="relative overflow-hidden bg-slate-50 py-20">
+        <ServicesCinematicBg />
+        <div className="container-x relative">
+          <AnimateOnScroll preset="fadeUp">
+            <div className="mx-auto max-w-3xl text-center">
+              <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">Complete Solutions</span>
+              <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+                Everything Your Business Needs to Travel
+              </h2>
+              <p className="mt-4 text-base text-slate-500">
+                From routine employee travel to executive journeys, international meetings and corporate events.
+              </p>
+            </div>
+          </AnimateOnScroll>
+          <div className="mt-12 space-y-5">
+            {SERVICES.map((svc, i) => (
+              <AnimateOnScroll key={svc.id} preset="fadeUp" delay={i * 0.06}>
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                >
+                  <Card className="overflow-hidden transition-shadow hover:shadow-lift">
+                    <CardContent className="p-0">
+                      <div className="flex flex-col lg:flex-row">
+                        <div className="flex items-center gap-4 border-b border-slate-100 bg-gradient-to-r from-brand-50/80 to-transparent p-6 lg:w-80 lg:border-b-0 lg:border-r lg:shrink-0">
+                          <motion.span
+                            className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow"
+                            whileHover={{ scale: 1.1, rotate: -5 }}
+                            transition={{ type: 'spring', stiffness: 400 }}
+                          >
+                            <svc.icon className="size-6" />
+                          </motion.span>
+                          <div>
+                            <h3 className="font-display text-lg font-semibold text-slate-900">{svc.title}</h3>
+                            {svc.badge && <Badge className="mt-1 bg-sun-100 text-sun-700 ring-0">{svc.badge}</Badge>}
+                          </div>
+                        </div>
+                        <div className="flex-1 p-6">
+                          <p className="text-sm text-slate-500">{svc.description}</p>
+                          {svc.items.length > 0 && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {svc.items.map((item) => (
+                                <motion.span
+                                  key={item}
+                                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+                                  whileHover={{ scale: 1.05 }}
+                                >
+                                  {item}
+                                </motion.span>
+                              ))}
+                            </div>
+                          )}
+                          {svc.extra && (
+                            <p className="mt-3 text-xs text-slate-400">
+                              <span className="font-semibold text-slate-500">{svc.extra.label}:</span> {svc.extra.value}
+                            </p>
+                          )}
+                          <div className="mt-4">
+                            <Button variant="secondary" size="sm" asChild>
+                              <Link to={svc.link}>{svc.cta} <ArrowRight className="size-3.5" /></Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </AnimateOnScroll>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Luxury hotel parallax ─── */}
+      <ParallaxBreak
+        src={BREAK_IMAGES.servicesBreak}
+        alt="Luxury hotel infinity pool at sunset"
+        quote="Travel is the only thing you buy that makes you richer."
+        author="— Corporate Travel Philosophy"
+      />
+
+      {/* ════════════════════════════ PLATFORM ════════════════════════════ */}
+      <section id="platform" className="relative overflow-hidden py-20">
+        <PlatformCinematicBg />
+        <div className="container-x relative">
+        <AnimateOnScroll preset="fadeUp">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">Technology</span>
+            <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+              Technology That Puts Your Business in Control
+            </h2>
+            <p className="mt-4 text-base text-slate-500">
+              Akbar Bizvoy combines travel services with technology to simplify the complete corporate travel lifecycle.
             </p>
-            <div className="mt-7 flex animate-fade-up flex-wrap items-center justify-center gap-3" style={{ animationDelay: '220ms' }}>
-              <Button size="lg" onClick={() => navigate('/login')}><Plane className="size-4" /> Sign in to book</Button>
-              <Button size="lg" variant="secondary" className="bg-white/10 text-white border-white/25 hover:bg-white/20" onClick={() => navigate('/register')}>
-                Request an account
+          </div>
+        </AnimateOnScroll>
+        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" staggerDelay={0.08}>
+          {PLATFORM_FEATURES.map((f) => (
+            <StaggerItem key={f.title}>
+              <TiltCard maxTilt={5} scale={1.02}>
+                <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
+                  <CardContent className="p-6">
+                    <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-sun-50 text-brand-600">
+                      <f.icon className="size-5" />
+                    </span>
+                    <h3 className="mt-3 font-display text-base font-semibold text-slate-900">{f.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{f.text}</p>
+                  </CardContent>
+                </Card>
+              </TiltCard>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Tech & analytics trio ─── */}
+      <AsymmetricGridBreak images={BREAK_IMAGES.platformBreak} />
+
+      {/* ════════════════════════════ HOW IT WORKS ════════════════════════════ */}
+      <section className="relative overflow-hidden bg-slate-50 py-20">
+        <HowItWorksCinematicBg />
+        <div className="container-x relative">
+          <AnimateOnScroll preset="fadeUp">
+            <div className="mx-auto max-w-3xl text-center">
+              <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">Process</span>
+              <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+                From Trip Request to Final Expense
+              </h2>
+            </div>
+          </AnimateOnScroll>
+          <div className="relative mx-auto mt-12 max-w-3xl">
+            <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-brand-300 via-brand-400 to-brand-300 lg:left-1/2" />
+            <div className="space-y-8">
+              {HOW_IT_WORKS.map((step, i) => {
+                const isLeft = i % 2 === 0
+                return (
+                  <AnimateOnScroll key={step.step} preset={isLeft ? 'fadeLeft' : 'fadeRight'} delay={i * 0.1}>
+                    <div className={cn('relative flex items-start gap-6', isLeft ? 'lg:flex-row' : 'lg:flex-row-reverse')}>
+                      <motion.div
+                        className="relative z-10 flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-sm font-bold text-white shadow-glow lg:absolute lg:left-1/2 lg:-translate-x-1/2"
+                        whileHover={{ scale: 1.2 }}
+                        transition={{ type: 'spring', stiffness: 400 }}
+                      >
+                        {step.step}
+                      </motion.div>
+                      <div className={cn('ml-4 flex-1 lg:ml-0', isLeft ? 'lg:pr-12 lg:text-right' : 'lg:pl-12')}>
+                        <Card className={cn('inline-block transition-all hover:-translate-y-1 hover:shadow-lift', isLeft ? 'lg:ml-auto' : '')}>
+                          <CardContent className="p-5">
+                            <h3 className="font-display text-lg font-semibold text-slate-900">{step.title}</h3>
+                            <p className="mt-1.5 text-sm text-slate-500">{step.text}</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+                  </AnimateOnScroll>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Travel journey editorial ─── */}
+      <EditorialBreak
+        src={BREAK_IMAGES.howItWorksBreak}
+        alt="Scenic travel journey"
+        caption="From trip request to final expense — one connected flow"
+        captionDetail="Every step of the corporate travel process is simplified. Search, select, approve, travel, submit and analyze — all from a single platform designed for how modern businesses work."
+        reverse
+      />
+
+      {/* ════════════════════════════ SOLUTIONS ════════════════════════════ */}
+      <section id="solutions" className="relative overflow-hidden py-20">
+        <SolutionsCinematicBg />
+        <div className="container-x relative">
+        <AnimateOnScroll preset="fadeUp">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">For Every Role</span>
+            <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+              One Platform. Different Needs.
+            </h2>
+          </div>
+        </AnimateOnScroll>
+        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" staggerDelay={0.1}>
+          {TEAM_SOLUTIONS.map((t) => (
+            <StaggerItem key={t.title}>
+              <TiltCard maxTilt={4} scale={1.02}>
+                <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
+                  <CardContent className="p-6">
+                    <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-sun-50 text-brand-600">
+                      <t.icon className="size-5" />
+                    </span>
+                    <p className="mt-4 text-[11px] font-bold uppercase tracking-widest text-brand-400">{t.title}</p>
+                    <h3 className="mt-1 font-display text-lg font-semibold text-slate-900">{t.heading}</h3>
+                    <ul className="mt-3 space-y-1.5">
+                      {t.benefits.map((b) => (
+                        <li key={b} className="flex items-center gap-2 text-sm text-slate-600">
+                          <CheckCircle2 className="size-3.5 shrink-0 text-emerald-500" /> {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </TiltCard>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Team collaboration quad ─── */}
+      <QuadStripBreak images={BREAK_IMAGES.solutionsBreak} />
+
+      {/* ════════════════════════════ GLOBAL NETWORK ════════════════════════════ */}
+      <section className="relative overflow-hidden bg-gradient-to-r from-brand-800 via-brand-700 to-brand-600 py-20">
+        <GlobalCinematicBg />
+        <div className="container-x relative">
+          <AnimateOnScroll preset="fadeUp">
+            <h2 className="text-center font-display text-3xl font-semibold text-white sm:text-4xl">
+              Wherever Business Takes You, We're Ready.
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-sm text-brand-100">
+              With more than 300 Akbar Travels offices worldwide, Akbar Bizvoy combines a global travel network with centralized corporate travel management.
+            </p>
+          </AnimateOnScroll>
+          <StaggerContainer className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4" staggerDelay={0.12}>
+            {GLOBAL_STATS.map((s) => (
+              <StaggerItem key={s.label}>
+                <motion.div
+                  className="rounded-2xl bg-white/10 p-7 text-center backdrop-blur-sm"
+                  whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
+                  <AnimatedStatNumber value={s.value} className="font-display text-4xl font-bold text-white" />
+                  <p className="mt-2 text-sm font-medium text-brand-200">{s.label}</p>
+                </motion.div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Paris cityscape parallax ─── */}
+      <ParallaxBreak
+        src={BREAK_IMAGES.globalBreak}
+        alt="Paris Eiffel Tower cityscape at dusk"
+        quote="Wherever business takes you, we're already there."
+        height='h-[300px] sm:h-[380px] lg:h-[440px]'
+      />
+
+      {/* ════════════════════════════ WHY CHOOSE ════════════════════════════ */}
+      <section id="why-us" className="relative overflow-hidden py-20">
+        <WhyChooseBg />
+        <div className="container-x relative">
+        <AnimateOnScroll preset="fadeUp">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">Why Us</span>
+            <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+              More Than a Travel Provider. A Corporate Travel Partner.
+            </h2>
+          </div>
+        </AnimateOnScroll>
+        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" staggerDelay={0.08}>
+          {WHY_CHOOSE.map((w) => (
+            <StaggerItem key={w.title}>
+              <TiltCard maxTilt={4} scale={1.015}>
+                <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
+                  <CardContent className="flex items-start gap-4 p-5">
+                    <motion.span
+                      className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-sun-50 text-brand-600"
+                      whileHover={{ scale: 1.15, rotate: 10 }}
+                      transition={{ type: 'spring', stiffness: 400 }}
+                    >
+                      <w.icon className="size-5" />
+                    </motion.span>
+                    <div>
+                      <h3 className="font-display text-base font-semibold text-slate-900">{w.title}</h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{w.text}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TiltCard>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Premium travel detail strip ─── */}
+      <QuadStripBreak images={BREAK_IMAGES.whyUsBreak} />
+
+      {/* ════════════════════════════ TESTIMONIALS ════════════════════════════ */}
+      <section className="relative overflow-hidden bg-slate-50 py-20">
+        <TestimonialsBg />
+        <div className="container-x relative">
+          <AnimateOnScroll preset="fadeUp">
+            <div className="mx-auto max-w-3xl text-center">
+              <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">Testimonials</span>
+              <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+                Trusted by Business Travelers
+              </h2>
+            </div>
+          </AnimateOnScroll>
+          <StaggerContainer className="mt-12 grid gap-6 sm:grid-cols-2" staggerDelay={0.12}>
+            {TESTIMONIALS.map((t) => (
+              <StaggerItem key={t.name}>
+                <TiltCard maxTilt={3} scale={1.01}>
+                  <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
+                    <CardContent className="p-6">
+                      <div className="mb-3 flex gap-1">
+                        {[0, 1, 2, 3, 4].map((i) => (
+                          <motion.div key={i} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 * i }}>
+                            <Star className="size-4 fill-sun-400 text-sun-400" />
+                          </motion.div>
+                        ))}
+                      </div>
+                      <blockquote className="text-sm leading-relaxed text-slate-600 italic">
+                        "{t.quote}"
+                      </blockquote>
+                      <div className="mt-4 flex items-center gap-3">
+                        <span className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-sm font-bold text-white">
+                          {t.name[0]}
+                        </span>
+                        <div>
+                          <p className="text-sm font-bold text-slate-900">{t.name}</p>
+                          <p className="text-xs text-slate-500">{t.role}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TiltCard>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
+      </section>
+
+      {/* ─── Image Break: Hotel lobby parallax ─── */}
+      <CinematicBreak
+        images={BREAK_IMAGES.testimonialsBreak}
+        height='h-[250px] sm:h-[300px] lg:h-[360px]'
+        caption="Premium hotel partnerships for discerning business travelers"
+      />
+
+      {/* ════════════════════════════ MOBILE ════════════════════════════ */}
+      <section className="relative overflow-hidden py-20">
+        <MobileBg />
+        <div className="container-x relative">
+        <AnimateOnScroll preset="scaleUp">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">Mobile</span>
+            <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+              Your Business Travel, Always Within Reach
+            </h2>
+            <p className="mt-4 text-base text-slate-500">
+              Stay connected with your corporate travel wherever you are. Access travel information, manage bookings on the go.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Button size="lg" variant="secondary" onClick={() => window.open('#', '_blank')}>
+                <svg className="mr-2 size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302a1 1 0 010 1.38l-2.302 2.302L15.394 13l2.304-3.492zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z" /></svg>
+                Download on Google Play
+              </Button>
+              <Button size="lg" variant="secondary" onClick={() => window.open('#', '_blank')}>
+                <svg className="mr-2 size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" /></svg>
+                Download on the App Store
               </Button>
             </div>
           </div>
-
-          {/* Business trip search */}
-          <form onSubmit={searchFlight} className="mx-auto mt-10 w-full max-w-4xl animate-fade-up rounded-2xl border border-white/15 bg-white/95 p-4 shadow-lift backdrop-blur sm:p-5" style={{ animationDelay: '280ms' }}>
-            <p className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-800">
-              <Briefcase className="size-4 text-brand-600" /> Plan your next business trip
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              <Select value={form.from} onValueChange={(v) => setForm({ ...form, from: v })}>
-                <SelectTrigger className="bg-white"><SelectValue placeholder="From" /></SelectTrigger>
-                <SelectContent>
-                  {AIRPORTS.map((a) => <SelectItem key={a.code} value={a.code}>{a.code} — {a.city}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select value={form.to} onValueChange={(v) => setForm({ ...form, to: v })}>
-                <SelectTrigger className="bg-white"><SelectValue placeholder="To" /></SelectTrigger>
-                <SelectContent>
-                  {AIRPORTS.map((a) => <SelectItem key={a.code} value={a.code}>{a.code} — {a.city}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <input type="date" value={form.date} min={todayISO()} onChange={(e) => setForm({ ...form, date: e.target.value })} className="h-11 rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-800" />
-              <input type="date" value={form.returnDate} min={form.date || todayISO()} onChange={(e) => setForm({ ...form, returnDate: e.target.value })} className="h-11 rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-800" />
-              <Button type="submit" className="h-11"><Plane className="size-4" /> Search flights</Button>
-            </div>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <button type="button" onClick={searchHotel} className="text-xs font-semibold text-brand-700 hover:underline">
-                <Hotel className="mr-1 inline size-3.5" /> Need a hotel at {AIRPORTS.find((a) => a.code === form.to)?.city || form.to}?
-              </button>
-              <span className="ml-auto text-[11px] text-slate-400">Search is a preview — sign in to submit requests.</span>
-            </div>
-          </form>
+        </AnimateOnScroll>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="container-x py-14">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((f) => (
-            <Card key={f.title} className="transition-all hover:-translate-y-0.5 hover:shadow-lift">
-              <CardContent className="p-5">
-                <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-sun-50 text-brand-600">
-                  <f.icon className="size-5" />
-                </span>
-                <h3 className="mt-3 font-display text-base font-semibold text-slate-900">{f.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{f.text}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA strip */}
-      <section className="container-x pb-16">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-600 p-8 shadow-lift sm:p-12">
-          <div className="absolute -right-16 -top-16 size-64 rounded-full bg-white/10" />
-          <div className="relative flex flex-wrap items-center justify-between gap-6">
-            <div className="max-w-xl text-white">
-              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-sun-300">
-                <Sparkles className="size-4" /> For your company
-              </p>
-              <h2 className="mt-3 font-display text-3xl font-semibold leading-tight">
-                Travel policy, approvals and spend — in one place
+      {/* ════════════════════════════ FAQ ════════════════════════════ */}
+      <section id="faq" className="relative overflow-hidden bg-slate-50 py-20">
+        <FaqBg />
+        <div className="container-x relative">
+          <AnimateOnScroll preset="fadeUp">
+            <div className="mx-auto max-w-3xl text-center">
+              <span className="mb-3 inline-block rounded-full bg-brand-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-brand-600">FAQ</span>
+              <h2 className="font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
+                Frequently Asked Questions
               </h2>
-              <p className="mt-3 text-sm text-brand-100">
-                Employees book within policy, managers approve with full context, and admins control limits, departments and analytics.
-              </p>
             </div>
-            <Button size="lg" variant="secondary" className="bg-white text-brand-700 hover:bg-brand-50" onClick={() => navigate('/login')}>
-              Explore the demo <ArrowRight className="size-4" />
-            </Button>
+          </AnimateOnScroll>
+          <div className="mx-auto mt-12 max-w-2xl">
+            <Accordion type="single" collapsible className="space-y-3">
+              {LANDING_FAQS.map((faq, i) => (
+                <AnimateOnScroll key={i} preset="fadeUp" delay={i * 0.05}>
+                  <AccordionItem value={`faq-${i}`} className="rounded-2xl border border-slate-200 bg-white px-5 shadow-soft transition-all hover:border-brand-200 hover:shadow-card">
+                    <AccordionTrigger className="py-4 text-left text-sm font-semibold text-slate-900 hover:no-underline hover:text-brand-700">
+                      {faq.q}
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4 text-sm leading-relaxed text-slate-500">
+                      {faq.a}
+                    </AccordionContent>
+                  </AccordionItem>
+                </AnimateOnScroll>
+              ))}
+            </Accordion>
+            <div className="mt-8 text-center">
+              <Link to="/faq" className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 shadow-soft transition-all hover:border-brand-300 hover:shadow-lift">
+                View All FAQs <ArrowRight className="size-4" />
+              </Link>
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* ─── Image Break: Dubai skyline parallax before CTA ─── */}
+      <ParallaxBreak
+        src={BREAK_IMAGES.finalCtaBreak}
+        alt="Dubai skyline at golden hour"
+        quote="Your business deserves smarter travel management."
+        author="— AkbarBizvoy"
+        height='h-[300px] sm:h-[380px] lg:h-[440px]'
+      />
+
+      {/* ════════════════════════════ FINAL CTA ════════════════════════════ */}
+      <section className="container-x py-20">
+        <AnimateOnScroll preset="scaleUp">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-600 p-8 shadow-lift sm:p-14">
+            <CtaCinematicBg />
+
+            <div className="relative mx-auto max-w-2xl text-center text-white">
+              <h2 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">
+                Ready to Simplify Business Travel?
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-brand-100">
+                Give your employees an easier way to travel while giving your business greater control over bookings, policies, expenses and travel spending.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                <MagneticButton
+                  onClick={() => navigate('/register')}
+                  className="flex h-12 items-center gap-2 rounded-xl bg-white px-7 text-sm font-bold text-brand-700 shadow-lg transition-all hover:bg-brand-50"
+                >
+                  Request a Demo
+                </MagneticButton>
+                <MagneticButton
+                  onClick={() => navigate('/contact')}
+                  className="flex h-12 items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-7 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/20"
+                >
+                  Talk to Our Travel Team <ArrowRight className="size-4" />
+                </MagneticButton>
+              </div>
+              <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-sun-300">
+                Travel smarter. Manage better. Move your business forward.
+              </p>
+            </div>
+          </div>
+        </AnimateOnScroll>
       </section>
     </div>
   )
 }
 
-/* ---------------------------------- Dashboard shell ---------------------------------- */
+/* ======================================== Dashboard Shell ======================================== */
 
 function StatCard({ icon: Icon, label, value, sub, tone = 'text-brand-600' }) {
   return (
@@ -198,27 +925,19 @@ function QuickActions() {
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Link to="/flights" className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-center transition-all hover:border-brand-300 hover:bg-brand-50/60">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-soft transition-transform group-hover:scale-105">
-              <Plane className="size-5" />
-            </span>
+            <span className="flex size-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-soft transition-transform group-hover:scale-105"><Plane className="size-5" /></span>
             <span className="text-xs font-bold text-slate-700">Book Flight</span>
           </Link>
           <Link to="/hotels" className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-center transition-all hover:border-brand-300 hover:bg-brand-50/60">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-soft transition-transform group-hover:scale-105">
-              <Hotel className="size-5" />
-            </span>
+            <span className="flex size-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-soft transition-transform group-hover:scale-105"><Hotel className="size-5" /></span>
             <span className="text-xs font-bold text-slate-700">Book Hotel</span>
           </Link>
           <Link to="/trips/new" className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-center transition-all hover:border-brand-300 hover:bg-brand-50/60">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-soft transition-transform group-hover:scale-105">
-              <Briefcase className="size-5" />
-            </span>
+            <span className="flex size-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-soft transition-transform group-hover:scale-105"><Briefcase className="size-5" /></span>
             <span className="text-xs font-bold text-slate-700">Create Trip</span>
           </Link>
           <Link to="/claims" className="group flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 text-center transition-all hover:border-brand-300 hover:bg-brand-50/60">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-soft transition-transform group-hover:scale-105">
-              <Receipt className="size-5" />
-            </span>
+            <span className="flex size-10 items-center justify-center rounded-xl bg-white text-brand-600 shadow-soft transition-transform group-hover:scale-105"><Receipt className="size-5" /></span>
             <span className="text-xs font-bold text-slate-700">File Expense</span>
           </Link>
         </div>
@@ -275,7 +994,36 @@ function RequestRow({ req }) {
   )
 }
 
-/* ---------------------------------- Employee dashboard ---------------------------------- */
+function BusinessTripSearch() {
+  const navigate = useNavigate()
+  const [form, setForm] = useState({ from: 'BOM', to: 'BLR', date: todayISO(14), returnDate: todayISO(17) })
+  const toCity = AIRPORTS.find((a) => a.code === form.to)?.city || form.to
+  return (
+    <div className="mt-6 rounded-2xl bg-gradient-to-r from-brand-200 via-sun-200 to-brand-200 p-px shadow-lift">
+      <div className="rounded-[15px] bg-white p-4 sm:p-5">
+        <p className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-800">
+          <Briefcase className="size-4 text-brand-600" /> What are you travelling for?
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+          <Select value={form.from} onValueChange={(v) => setForm({ ...form, from: v })}>
+            <SelectTrigger className="bg-slate-50"><SelectValue placeholder="From" /></SelectTrigger>
+            <SelectContent>{AIRPORTS.map((a) => <SelectItem key={a.code} value={a.code}>{a.code} — {a.city}</SelectItem>)}</SelectContent>
+          </Select>
+          <Select value={form.to} onValueChange={(v) => setForm({ ...form, to: v })}>
+            <SelectTrigger className="bg-slate-50"><SelectValue placeholder="To" /></SelectTrigger>
+            <SelectContent>{AIRPORTS.map((a) => <SelectItem key={a.code} value={a.code}>{a.code} — {a.city}</SelectItem>)}</SelectContent>
+          </Select>
+          <input type="date" value={form.date} min={todayISO()} onChange={(e) => setForm({ ...form, date: e.target.value })} className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-800" />
+          <input type="date" value={form.returnDate} min={form.date || todayISO()} onChange={(e) => setForm({ ...form, returnDate: e.target.value })} className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-800" />
+          <Button className="h-11" onClick={() => navigate(`/flights?trip=roundtrip&from=${form.from}&to=${form.to}&date=${form.date}&return=${form.returnDate}&cabin=Economy&corp=1`)}><Plane className="size-4" /> Flights</Button>
+          <Button variant="secondary" className="h-11" onClick={() => navigate(`/hotels?destination=${toCity}&checkIn=${form.date}&checkOut=${form.returnDate}&corp=1`)}><Hotel className="size-4" /> Hotel</Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ======================================== Employee Dashboard ======================================== */
 
 function EmployeeDashboard({ requests }) {
   const { user } = useAuth()
@@ -289,13 +1037,12 @@ function EmployeeDashboard({ requests }) {
 
   return (
     <div className="bg-slate-50">
-      {/* Header */}
       <div className="border-b border-slate-200 bg-white">
         <div className="container-x py-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="flex items-center gap-2 text-sm font-semibold text-slate-500">
-                <Building2 className="size-4 text-brand-600" /> Acme Technologies · {user?.department}
+                <Building2 className="size-4 text-brand-600" /> AkbarBizvoy · {user?.department}
               </p>
               <h1 className="mt-1.5 font-display text-3xl font-semibold text-slate-900 sm:text-4xl">
                 {greeting()}, {user?.firstName} 👋
@@ -308,107 +1055,48 @@ function EmployeeDashboard({ requests }) {
           </div>
         </div>
       </div>
-
       <div className="container-x py-8">
-        {/* Stats */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatCard icon={Clock} label="Pending requests" value={pending.length} tone="text-amber-600" />
           <StatCard icon={CheckCircle2} label="Approved upcoming" value={approvedUpcoming.length} tone="text-emerald-600" />
           <StatCard icon={Wallet} label="My estimated spend" value={<Price amount={stats.totalSpend} />} tone="text-brand-600" />
           <StatCard icon={ShieldCheck} label="Policy compliance" value={`${stats.violations ? '⚠' : '100%'}`} sub={stats.violations ? `${stats.violations} exception${stats.violations > 1 ? 's' : ''}` : 'all compliant'} tone="text-slate-600" />
         </div>
-
-        {/* Business trip search */}
         <BusinessTripSearch />
-
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          {/* Left column */}
           <div className="space-y-6 lg:col-span-2">
             <UpcomingTripCard req={upcoming[0]} />
-
             {pending.length > 0 && (
               <Card>
                 <CardContent className="p-5">
                   <div className="mb-3 flex items-center justify-between">
-                    <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                      <Clock className="size-4 text-amber-600" /> Pending approval
-                    </p>
+                    <p className="flex items-center gap-2 text-sm font-bold text-slate-900"><Clock className="size-4 text-amber-600" /> Pending approval</p>
                     <Link to="/my-trips?tab=pending" className="text-xs font-semibold text-brand-700 hover:underline">View all</Link>
                   </div>
-                  <div className="space-y-2">
-                    {pending.slice(0, 3).map((r) => <RequestRow key={r.id} req={r} />)}
-                  </div>
+                  <div className="space-y-2">{pending.slice(0, 3).map((r) => <RequestRow key={r.id} req={r} />)}</div>
                 </CardContent>
               </Card>
             )}
-
             {recent.length > 0 && (
               <Card>
                 <CardContent className="p-5">
                   <div className="mb-3 flex items-center justify-between">
-                    <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                      <Plane className="size-4 text-brand-600" /> Recent trips
-                    </p>
+                    <p className="flex items-center gap-2 text-sm font-bold text-slate-900"><Plane className="size-4 text-brand-600" /> Recent trips</p>
                     <Link to="/my-trips" className="text-xs font-semibold text-brand-700 hover:underline">View all</Link>
                   </div>
-                  <div className="space-y-2">
-                    {recent.map((r) => <RequestRow key={r.id} req={r} />)}
-                  </div>
+                  <div className="space-y-2">{recent.map((r) => <RequestRow key={r.id} req={r} />)}</div>
                 </CardContent>
               </Card>
             )}
           </div>
-
-          {/* Right column */}
-          <div className="space-y-6">
-            <QuickActions />
-            <MyPolicyCard />
-          </div>
+          <div className="space-y-6"><QuickActions /><MyPolicyCard /></div>
         </div>
       </div>
     </div>
   )
 }
 
-function BusinessTripSearch() {
-  const navigate = useNavigate()
-  const [form, setForm] = useState({ from: 'BOM', to: 'BLR', date: todayISO(14), returnDate: todayISO(17) })
-  const toCity = AIRPORTS.find((a) => a.code === form.to)?.city || form.to
-
-  return (
-    <div className="mt-6 rounded-2xl bg-gradient-to-r from-brand-200 via-sun-200 to-brand-200 p-px shadow-lift">
-      <div className="rounded-[15px] bg-white p-4 sm:p-5">
-        <p className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-800">
-          <Briefcase className="size-4 text-brand-600" /> What are you travelling for?
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-          <Select value={form.from} onValueChange={(v) => setForm({ ...form, from: v })}>
-            <SelectTrigger className="bg-slate-50"><SelectValue placeholder="From" /></SelectTrigger>
-            <SelectContent>
-              {AIRPORTS.map((a) => <SelectItem key={a.code} value={a.code}>{a.code} — {a.city}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={form.to} onValueChange={(v) => setForm({ ...form, to: v })}>
-            <SelectTrigger className="bg-slate-50"><SelectValue placeholder="To" /></SelectTrigger>
-            <SelectContent>
-              {AIRPORTS.map((a) => <SelectItem key={a.code} value={a.code}>{a.code} — {a.city}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <input type="date" value={form.date} min={todayISO()} onChange={(e) => setForm({ ...form, date: e.target.value })} className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-800" />
-          <input type="date" value={form.returnDate} min={form.date || todayISO()} onChange={(e) => setForm({ ...form, returnDate: e.target.value })} className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-sm text-slate-800" />
-          <Button className="h-11" onClick={() => navigate(`/flights?trip=roundtrip&from=${form.from}&to=${form.to}&date=${form.date}&return=${form.returnDate}&cabin=Economy&corp=1`)}>
-            <Plane className="size-4" /> Flights
-          </Button>
-          <Button variant="secondary" className="h-11" onClick={() => navigate(`/hotels?destination=${toCity}&checkIn=${form.date}&checkOut=${form.returnDate}&corp=1`)}>
-            <Hotel className="size-4" /> Hotel
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ---------------------------------- Approver overview ---------------------------------- */
+/* ======================================== Approver Overview ======================================== */
 
 function ApproverOverview({ requests }) {
   const pending = requests.filter((r) => r.status === 'pending')
@@ -437,9 +1125,7 @@ function ApproverOverview({ requests }) {
               <div className="space-y-2">
                 {pending.length === 0 ? (
                   <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">All caught up — no pending requests.</p>
-                ) : (
-                  pending.map((r) => <RequestRow key={r.id} req={r} />)
-                )}
+                ) : pending.map((r) => <RequestRow key={r.id} req={r} />)}
               </div>
             </CardContent>
           </Card>
@@ -465,7 +1151,7 @@ function ApproverOverview({ requests }) {
   )
 }
 
-/* ---------------------------------- Finance overview ---------------------------------- */
+/* ======================================== Finance Overview ======================================== */
 
 function FinanceOverview({ requests, claims }) {
   const list = claims || []
@@ -547,7 +1233,7 @@ function FinanceOverview({ requests, claims }) {
   )
 }
 
-/* ---------------------------------- Admin overview ---------------------------------- */
+/* ======================================== Admin Overview ======================================== */
 
 function AdminOverview({ requests }) {
   const stats = computeStats(requests)
@@ -619,7 +1305,7 @@ function AdminOverview({ requests }) {
   )
 }
 
-/* ---------------------------------- Entry ---------------------------------- */
+/* ======================================== Entry ======================================== */
 
 export default function Home() {
   const { user, isAuthenticated, role, sessionChecked } = useAuth()

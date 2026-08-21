@@ -174,3 +174,29 @@ body {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
+
+/* ── Ken Burns cinematic animations for landing page backgrounds ── */
+@keyframes kenburns-0 {
+  from { transform: scale(1.0) translate(0%, 0%); }
+  to   { transform: scale(1.12) translate(-2%, -1%); }
+}
+@keyframes kenburns-1 {
+  from { transform: scale(1.0) translate(0%, 0%); }
+  to   { transform: scale(1.10) translate(2%, 1%); }
+}
+@keyframes kenburns-2 {
+  from { transform: scale(1.0) translate(-1%, 0%); }
+  to   { transform: scale(1.12) translate(1%, -1%); }
+}
+@keyframes kenburns-3 {
+  from { transform: scale(1.05) translate(1%, -1%); }
+  to   { transform: scale(1.0) translate(-1%, 1%); }
+}
+@keyframes kenburns-4 {
+  from { transform: scale(1.0) translate(0%, -1%); }
+  to   { transform: scale(1.10) translate(0%, 1%); }
+}
+@keyframes kenburns-5 {
+  from { transform: scale(1.0) translate(-1%, 1%); }
+  to   { transform: scale(1.12) translate(1%, 0%); }
+}

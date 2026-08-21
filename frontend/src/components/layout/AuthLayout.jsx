@@ -14,7 +14,7 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
     <div className="grid min-h-screen bg-white lg:grid-cols-2">
       {/* Brand panel */}
       <div className="relative hidden overflow-hidden lg:block">
-        <Img src="plane" alt="Sunrise travel" className="absolute inset-0" eager />
+        <Img src="plane" alt="AkbarBizvoy corporate travel" className="absolute inset-0" eager />
         <div className="absolute inset-0 bg-gradient-to-br from-brand-950/90 via-slate-950/70 to-sun-700/60" />
         <div className="relative flex h-full flex-col justify-between p-10 text-white">
           <Logo light />
@@ -23,7 +23,7 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
               Business travel, approval-ready.
             </p>
             <p className="mt-3 max-w-sm text-sm text-slate-300">
-              The corporate travel portal for Acme Technologies — plan official trips, stay within policy and get manager approval in a few clicks.
+              The corporate travel portal for AkbarBizvoy — plan official trips, stay within policy and get manager approval in a few clicks.
             </p>
             <div className="mt-8 space-y-4">
               {FEATURES.map((f) => (
@@ -39,7 +39,7 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
               ))}
             </div>
           </div>
-          <p className="text-xs text-slate-400">© 2026 Project Sunrise · Corporate Travel Management</p>
+          <p className="text-xs text-slate-400">© 2026 AkbarBizvoy · Corporate Travel Solutions</p>
         </div>
       </div>
 

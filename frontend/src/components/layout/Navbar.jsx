@@ -21,9 +21,14 @@ import { useToast } from '../../context/ToastContext.jsx'
 import { cn } from '../../lib/utils.js'
 
 const GUEST_LINKS = [
-  { to: '/flights', label: 'Flights', icon: Plane },
-  { to: '/hotels', label: 'Hotels', icon: Hotel },
-  { to: '/login', label: 'Sign in', icon: User },
+  { to: '/', label: 'Home', icon: LayoutDashboard, end: true },
+  { to: '/about', label: 'About', icon: Building2, end: true },
+  { to: '/services', label: 'Services', icon: Briefcase },
+  { to: '/solutions', label: 'Solutions', icon: Users },
+  { to: '/features', label: 'Features', icon: ClipboardList },
+  { to: '/why-us', label: 'Why Us', icon: ShieldCheck },
+  { to: '/faq', label: 'FAQ', icon: ClipboardList },
+  { to: '/contact', label: 'Contact', icon: Hotel, end: true },
 ]
 
 const EMPLOYEE_LINKS = [
@@ -65,6 +70,12 @@ function linksFor(role, isAuthenticated) {
   if (role === 'approver') return APPROVER_LINKS
   if (role === 'finance') return FINANCE_LINKS
   return EMPLOYEE_LINKS
+}
+
+function scrollToSection(hash) {
+  const id = hash.replace('#', '')
+  const el = document.getElementById(id)
+  if (el) el.scrollIntoView({ behavior: 'smooth' })
 }
 
 export default function Navbar() {
@@ -132,19 +143,29 @@ export default function Navbar() {
                 {role === 'admin' ? 'Admin' : role === 'approver' ? 'Approver' : role === 'finance' ? 'Finance' : isAuthenticated ? 'Corporate travel' : 'Corporate portal'}
               </p>
               {links.map((l) => (
-                <NavLink
-                  key={l.to}
-                  to={l.to}
-                  end={l.end}
-                  className={({ isActive }) =>
-                    cn(
+                l.hash ? (
+                  <button
+                    key={l.hash}
+                    onClick={() => scrollToSection(l.hash)}
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-brand-600 transition-colors hover:bg-brand-50 hover:text-brand-700"
+                  >
+                    <l.icon className="size-4" /> {l.label}
+                  </button>
+                ) : (
+                  <NavLink
+                    key={l.to}
+                    to={l.to}
+                    end={l.end}
+                    className={({ isActive }) =>
+                      cn(
                       'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors',
-                      isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50',
-                    )
-                  }
-                >
-                  <l.icon className="size-4" /> {l.label}
-                </NavLink>
+                      isActive ? 'text-brand-700 bg-brand-50' : 'text-brand-600 hover:bg-brand-50 hover:text-brand-700',
+                      )
+                    }
+                  >
+                    <l.icon className="size-4" /> {l.label}
+                  </NavLink>
+                )
               ))}
               {isAuthenticated && (
                 <>
@@ -210,19 +231,24 @@ export default function Navbar() {
         {/* Desktop nav */}
         <nav className="hidden items-center gap-0.5 lg:flex">
           {links.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.end}
-              className={({ isActive }) =>
-                cn(
-                  'rounded-full px-3.5 py-2 text-sm font-semibold transition-all',
-                  isActive ? 'bg-brand-50 text-brand-700 shadow-[inset_0_0_0_1px_rgb(59_91_255/0.12)]' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-                )
-              }
-            >
-              {l.label}
-            </NavLink>
+            l.hash ? (
+              <button
+                key={l.hash}
+                onClick={() => scrollToSection(l.hash)}
+                className="rounded-full px-3.5 py-2 text-sm font-semibold text-brand-600 transition-all hover:bg-brand-50 hover:text-brand-700"
+              >
+                {l.label}
+              </button>
+            ) : (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                end={l.end}
+                className="rounded-full px-3.5 py-2 text-sm font-semibold text-brand-600 transition-all hover:bg-brand-50 hover:text-brand-700"
+              >
+                {l.label}
+              </NavLink>
+            )
           ))}
         </nav>
 
