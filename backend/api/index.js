@@ -96,11 +96,16 @@ app.use(async (req, res, next) => {
       console.log('✅ MongoDB connected (serverless)');
     } catch (err) {
       console.error('❌ MongoDB connection failed:', err.message);
-      return res.status(500).json({ success: false, message: 'Database connection failed' });
+      return res.status(500).json({
+        success: false,
+        message: 'Database connection failed'
+      });
     }
   }
+
   next();
 });
+
 
 // Export the Express app for Vercel serverless
 export default app;
