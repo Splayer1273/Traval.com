@@ -11,6 +11,7 @@ const app = express();
 // Allow the production frontend URL (CLIENT_URL) and local dev.
 // Cannot use '*' with credentials — browsers reject it.
 const allowedOrigins = [
+  process.env.FRONTEND_URL,
   process.env.CLIENT_URL,
   'http://localhost:5173',
   'http://localhost:3000',

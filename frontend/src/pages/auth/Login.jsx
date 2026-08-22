@@ -131,7 +131,6 @@ export default function Login() {
               error('Google sign-in was cancelled or failed.', 'Sign in failed')
             }}
             size="large"
-            width="100%"
             text="signin_with"
             shape="rectangular"
           />

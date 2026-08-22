@@ -7,10 +7,10 @@ import axios from 'axios'
  * modules, but those modules are structured to swap their mock implementations
  * for these HTTP calls later — no component talks to `api` directly.
  */
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 export const api = axios.create({
-  baseURL,
+  baseURL: API_URL,
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 })
