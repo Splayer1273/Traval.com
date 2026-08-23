@@ -120,11 +120,23 @@ export default function Login() {
           <GoogleLogin
             onSuccess={async (credentialResponse) => {
               try {
-                await googleLogin(credentialResponse.credential)
-                success('Signed in with Google.', 'Welcome back')
-                navigate('/')
+                if (!credentialResponse?.credential) {
+                  throw new Error('Google credential was not received.');
+                }
+
+                await googleLogin(credentialResponse.credential);
+
+                success('Signed in with Google.', 'Welcome back');
+                navigate('/');
               } catch (e) {
-                error(e.message, 'Google sign-in failed')
+                console.error('Google login error:', e);
+
+                error(
+                  e?.response?.data?.message ||
+                  e?.message ||
+                  'Unable to sign in with Google.',
+                  'Google sign-in failed'
+                );
               }
             }}
             onError={() => {

@@ -72,7 +72,22 @@ export const authApi = {
     return { success: true }
   },
   async googleLogin(credential) {
-    const res = await api.post('/auth/google', { credential })
-    return { user: mapUser(res.data.user), token: res.data.token }
-  },
+    try {
+      const res = await api.post('/auth/google', {
+        credential,
+      })
+
+      return {
+        user: mapUser(res.data.user),
+        token: res.data.token,
+      }
+    } catch (error) {
+      console.error(
+        'Google login API error:',
+        error.response?.data || error.message
+      )
+
+      throw error
+    }
+  }
 }
