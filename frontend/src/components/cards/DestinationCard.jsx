@@ -10,7 +10,7 @@ export default function DestinationCard({ d }) {
       to={`/destinations/${d.slug}`}
       className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
     >
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden sm:h-48">
         <Img
           src={d.image}
           alt={`${d.city}, ${d.country}`}
@@ -25,10 +25,10 @@ export default function DestinationCard({ d }) {
           <p className="flex items-center gap-1 text-xs font-medium text-slate-200">
             <MapPin className="size-3" /> {d.country}
           </p>
-          <h3 className="font-display text-xl font-semibold">{d.city}</h3>
+          <h3 className="font-display text-lg font-semibold sm:text-xl">{d.city}</h3>
         </div>
       </div>
-      <div className="flex items-center justify-between gap-2 p-4">
+      <div className="flex items-center justify-between gap-2 p-3 sm:p-4">
         <div className="flex items-center gap-2">
           <span className="flex items-center gap-1 rounded-md bg-emerald-600 px-1.5 py-0.5 text-xs font-bold text-white">
             <Star className="size-3 fill-current" /> {d.rating}

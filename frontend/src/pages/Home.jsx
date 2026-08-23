@@ -159,7 +159,7 @@ function GuestLanding() {
   return (
     <div>
       {/* ════════════════════════════════ HERO ════════════════════════════════ */}
-      <section ref={heroRef} className="relative min-h-[680px] overflow-hidden bg-slate-950">
+      <section ref={heroRef} className="relative min-h-[500px] sm:min-h-[600px] lg:min-h-[680px] overflow-hidden bg-slate-950">
         <HeroCinematicBg />
 
         {/* Animated route lines */}
@@ -169,7 +169,7 @@ function GuestLanding() {
         <FloatingParticles />
 
         {/* Hero content with parallax */}
-        <motion.div style={{ y: heroY, opacity: heroOpacity, scale: heroScale }} className="container-x relative flex min-h-[680px] flex-col justify-center py-20">
+        <motion.div style={{ y: heroY, opacity: heroOpacity, scale: heroScale }} className="container-x relative flex min-h-[500px] sm:min-h-[600px] lg:min-h-[680px] flex-col justify-center py-12 sm:py-16 lg:py-20">
           <div className="mx-auto w-full max-w-4xl text-center text-white">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -210,27 +210,27 @@ function GuestLanding() {
             </motion.p>
 
             <motion.div
-              className="mt-10 flex flex-wrap items-center justify-center gap-4"
+              className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-10 sm:gap-4"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.5, ease: 'easeOut' }}
             >
               <MagneticButton
                 onClick={() => navigate('/register')}
-                className="flex h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-7 text-sm font-bold text-white shadow-glow transition-all hover:from-brand-600 hover:to-brand-700"
+                className="flex h-10 items-center gap-2 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-5 text-sm font-bold text-white shadow-glow transition-all hover:from-brand-600 hover:to-brand-700 sm:h-12 sm:px-7"
               >
                 Request a Demo
               </MagneticButton>
               <MagneticButton
                 onClick={() => navigate('/about')}
-                className="flex h-12 items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-7 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10"
+                className="flex h-10 items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:h-12 sm:px-7"
               >
                 Explore Solutions <ArrowRight className="size-4" />
               </MagneticButton>
             </motion.div>
 
             <motion.div
-              className="mt-10 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500"
+              className="mt-6 flex flex-wrap items-center justify-center gap-3 text-[10px] text-slate-500 sm:mt-10 sm:gap-6 sm:text-xs"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
@@ -269,7 +269,7 @@ function GuestLanding() {
       />
 
       {/* ════════════════════════════ CHALLENGE ════════════════════════════ */}
-      <section className="relative overflow-hidden py-20">
+      <section className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
         <ChallengeBg />
         <div className="container-x relative">
         <AnimateOnScroll preset="fadeUp">
@@ -283,12 +283,12 @@ function GuestLanding() {
             </p>
           </div>
         </AnimateOnScroll>
-        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" staggerDelay={0.08}>
+        <StaggerContainer className="mt-8 grid gap-4 sm:mt-12 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3" staggerDelay={0.08}>
           {CHALLENGES.map((c) => (
             <StaggerItem key={c.title}>
               <TiltCard maxTilt={4} scale={1.015}>
                 <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-50 to-sun-50 text-brand-600">
                       <c.icon className="size-5" />
                     </span>
@@ -310,7 +310,7 @@ function GuestLanding() {
       />
 
       {/* ════════════════════════════ SOLUTION ════════════════════════════ */}
-      <section className="relative overflow-hidden bg-slate-50 py-20">
+      <section className="relative overflow-hidden bg-slate-50 py-12 sm:py-16 lg:py-20">
         <SolutionBg />
         <div className="container-x relative">
           <AnimateOnScroll preset="fadeUp">
@@ -324,7 +324,7 @@ function GuestLanding() {
               </p>
             </div>
           </AnimateOnScroll>
-          <StaggerContainer className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5" staggerDelay={0.1}>
+          <StaggerContainer className="mt-8 grid gap-3 sm:mt-12 sm:gap-4 sm:grid-cols-2 lg:grid-cols-5" staggerDelay={0.1}>
             {SOLUTION_STEPS.map((s, i) => (
               <StaggerItem key={s.label}>
                 <div className="relative">
@@ -375,7 +375,7 @@ function GuestLanding() {
       />
 
       {/* ════════════════════════════ TRUST STATS ════════════════════════════ */}
-      <section className="relative overflow-hidden py-20">
+      <section className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
         <TrustCinematicBg />
         <div className="container-x relative">
         <AnimateOnScroll preset="fadeUp">
@@ -386,12 +386,12 @@ function GuestLanding() {
             </h2>
           </div>
         </AnimateOnScroll>
-        <StaggerContainer className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4" staggerDelay={0.12}>
+        <StaggerContainer className="mt-8 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:grid-cols-4" staggerDelay={0.12}>
           {TRUST_STATS.map((s) => (
             <StaggerItem key={s.label}>
               <TiltCard maxTilt={3} scale={1.02}>
                 <Card className="text-center transition-all hover:-translate-y-1 hover:shadow-lift">
-                  <CardContent className="p-7">
+                  <CardContent className="p-5 sm:p-7">
                     <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow">
                       <AnimatedStatNumber value={s.value} className="font-display text-2xl font-bold" />
                     </div>
@@ -403,7 +403,7 @@ function GuestLanding() {
           ))}
         </StaggerContainer>
         <AnimateOnScroll preset="fadeUp" delay={0.3}>
-          <p className="mx-auto mt-10 max-w-3xl text-center text-sm leading-relaxed text-slate-500">
+          <p className="mx-auto mt-6 max-w-3xl text-center text-xs leading-relaxed text-slate-500 sm:mt-10 sm:text-sm">
             Akbar Bizvoy combines decades of travel expertise with modern technology to help businesses manage corporate travel more efficiently.
           </p>
         </AnimateOnScroll>
@@ -418,7 +418,7 @@ function GuestLanding() {
       />
 
       {/* ════════════════════════════ SERVICES ════════════════════════════ */}
-      <section id="services" className="relative overflow-hidden bg-slate-50 py-20">
+      <section id="services" className="relative overflow-hidden bg-slate-50 py-12 sm:py-16 lg:py-20">
         <ServicesCinematicBg />
         <div className="container-x relative">
           <AnimateOnScroll preset="fadeUp">
@@ -432,7 +432,7 @@ function GuestLanding() {
               </p>
             </div>
           </AnimateOnScroll>
-          <div className="mt-12 space-y-5">
+          <div className="mt-8 space-y-3 sm:mt-12 sm:space-y-5">
             {SERVICES.map((svc, i) => (
               <AnimateOnScroll key={svc.id} preset="fadeUp" delay={i * 0.06}>
                 <motion.div
@@ -500,7 +500,7 @@ function GuestLanding() {
       />
 
       {/* ════════════════════════════ PLATFORM ════════════════════════════ */}
-      <section id="platform" className="relative overflow-hidden py-20">
+      <section id="platform" className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
         <PlatformCinematicBg />
         <div className="container-x relative">
         <AnimateOnScroll preset="fadeUp">
@@ -514,12 +514,12 @@ function GuestLanding() {
             </p>
           </div>
         </AnimateOnScroll>
-        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" staggerDelay={0.08}>
+        <StaggerContainer className="mt-8 grid gap-4 sm:mt-12 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4" staggerDelay={0.08}>
           {PLATFORM_FEATURES.map((f) => (
             <StaggerItem key={f.title}>
               <TiltCard maxTilt={5} scale={1.02}>
                 <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-sun-50 text-brand-600">
                       <f.icon className="size-5" />
                     </span>
@@ -538,7 +538,7 @@ function GuestLanding() {
       <AsymmetricGridBreak images={BREAK_IMAGES.platformBreak} />
 
       {/* ════════════════════════════ HOW IT WORKS ════════════════════════════ */}
-      <section className="relative overflow-hidden bg-slate-50 py-20">
+      <section className="relative overflow-hidden bg-slate-50 py-12 sm:py-16 lg:py-20">
         <HowItWorksCinematicBg />
         <div className="container-x relative">
           <AnimateOnScroll preset="fadeUp">
@@ -549,9 +549,9 @@ function GuestLanding() {
               </h2>
             </div>
           </AnimateOnScroll>
-          <div className="relative mx-auto mt-12 max-w-3xl">
+          <div className="relative mx-auto mt-8 max-w-3xl sm:mt-12">
             <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-brand-300 via-brand-400 to-brand-300 lg:left-1/2" />
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {HOW_IT_WORKS.map((step, i) => {
                 const isLeft = i % 2 === 0
                 return (
@@ -566,7 +566,7 @@ function GuestLanding() {
                       </motion.div>
                       <div className={cn('ml-4 flex-1 lg:ml-0', isLeft ? 'lg:pr-12 lg:text-right' : 'lg:pl-12')}>
                         <Card className={cn('inline-block transition-all hover:-translate-y-1 hover:shadow-lift', isLeft ? 'lg:ml-auto' : '')}>
-                          <CardContent className="p-5">
+                          <CardContent className="p-4 sm:p-5">
                             <h3 className="font-display text-lg font-semibold text-slate-900">{step.title}</h3>
                             <p className="mt-1.5 text-sm text-slate-500">{step.text}</p>
                           </CardContent>
@@ -591,7 +591,7 @@ function GuestLanding() {
       />
 
       {/* ════════════════════════════ SOLUTIONS ════════════════════════════ */}
-      <section id="solutions" className="relative overflow-hidden py-20">
+      <section id="solutions" className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
         <SolutionsCinematicBg />
         <div className="container-x relative">
         <AnimateOnScroll preset="fadeUp">
@@ -602,12 +602,12 @@ function GuestLanding() {
             </h2>
           </div>
         </AnimateOnScroll>
-        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" staggerDelay={0.1}>
+        <StaggerContainer className="mt-8 grid gap-4 sm:mt-12 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4" staggerDelay={0.1}>
           {TEAM_SOLUTIONS.map((t) => (
             <StaggerItem key={t.title}>
               <TiltCard maxTilt={4} scale={1.02}>
                 <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-6">
                     <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-sun-50 text-brand-600">
                       <t.icon className="size-5" />
                     </span>
@@ -644,11 +644,11 @@ function GuestLanding() {
               With more than 300 Akbar Travels offices worldwide, Akbar Bizvoy combines a global travel network with centralized corporate travel management.
             </p>
           </AnimateOnScroll>
-          <StaggerContainer className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4" staggerDelay={0.12}>
+          <StaggerContainer className="mt-8 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:grid-cols-4" staggerDelay={0.12}>
             {GLOBAL_STATS.map((s) => (
               <StaggerItem key={s.label}>
                 <motion.div
-                  className="rounded-2xl bg-white/10 p-7 text-center backdrop-blur-sm"
+                  className="rounded-2xl bg-white/10 p-5 text-center backdrop-blur-sm sm:p-7"
                   whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
                   transition={{ type: 'spring', stiffness: 300 }}
                 >
@@ -670,7 +670,7 @@ function GuestLanding() {
       />
 
       {/* ════════════════════════════ WHY CHOOSE ════════════════════════════ */}
-      <section id="why-us" className="relative overflow-hidden py-20">
+      <section id="why-us" className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
         <WhyChooseBg />
         <div className="container-x relative">
         <AnimateOnScroll preset="fadeUp">
@@ -681,12 +681,12 @@ function GuestLanding() {
             </h2>
           </div>
         </AnimateOnScroll>
-        <StaggerContainer className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" staggerDelay={0.08}>
+        <StaggerContainer className="mt-8 grid gap-4 sm:mt-12 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3" staggerDelay={0.08}>
           {WHY_CHOOSE.map((w) => (
             <StaggerItem key={w.title}>
               <TiltCard maxTilt={4} scale={1.015}>
                 <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
-                  <CardContent className="flex items-start gap-4 p-5">
+                  <CardContent className="flex items-start gap-3 p-4 sm:gap-4 sm:p-5">
                     <motion.span
                       className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50 to-sun-50 text-brand-600"
                       whileHover={{ scale: 1.15, rotate: 10 }}
@@ -711,7 +711,7 @@ function GuestLanding() {
       <QuadStripBreak images={BREAK_IMAGES.whyUsBreak} />
 
       {/* ════════════════════════════ TESTIMONIALS ════════════════════════════ */}
-      <section className="relative overflow-hidden bg-slate-50 py-20">
+      <section className="relative overflow-hidden bg-slate-50 py-12 sm:py-16 lg:py-20">
         <TestimonialsBg />
         <div className="container-x relative">
           <AnimateOnScroll preset="fadeUp">
@@ -722,12 +722,12 @@ function GuestLanding() {
               </h2>
             </div>
           </AnimateOnScroll>
-          <StaggerContainer className="mt-12 grid gap-6 sm:grid-cols-2" staggerDelay={0.12}>
+          <StaggerContainer className="mt-8 grid gap-4 sm:mt-12 sm:gap-6 sm:grid-cols-2" staggerDelay={0.12}>
             {TESTIMONIALS.map((t) => (
               <StaggerItem key={t.name}>
                 <TiltCard maxTilt={3} scale={1.01}>
                   <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lift">
-                    <CardContent className="p-6">
+                    <CardContent className="p-4 sm:p-6">
                       <div className="mb-3 flex gap-1">
                         {[0, 1, 2, 3, 4].map((i) => (
                           <motion.div key={i} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 * i }}>
@@ -764,7 +764,7 @@ function GuestLanding() {
       />
 
       {/* ════════════════════════════ MOBILE ════════════════════════════ */}
-      <section className="relative overflow-hidden py-20">
+      <section className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
         <MobileBg />
         <div className="container-x relative">
         <AnimateOnScroll preset="scaleUp">
@@ -776,7 +776,7 @@ function GuestLanding() {
             <p className="mt-4 text-base text-slate-500">
               Stay connected with your corporate travel wherever you are. Access travel information, manage bookings on the go.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:mt-8 sm:gap-3">
               <Button size="lg" variant="secondary" onClick={() => window.open('#', '_blank')}>
                 <svg className="mr-2 size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302a1 1 0 010 1.38l-2.302 2.302L15.394 13l2.304-3.492zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z" /></svg>
                 Download on Google Play
@@ -792,7 +792,7 @@ function GuestLanding() {
       </section>
 
       {/* ════════════════════════════ FAQ ════════════════════════════ */}
-      <section id="faq" className="relative overflow-hidden bg-slate-50 py-20">
+      <section id="faq" className="relative overflow-hidden bg-slate-50 py-12 sm:py-16 lg:py-20">
         <FaqBg />
         <div className="container-x relative">
           <AnimateOnScroll preset="fadeUp">
@@ -803,7 +803,7 @@ function GuestLanding() {
               </h2>
             </div>
           </AnimateOnScroll>
-          <div className="mx-auto mt-12 max-w-2xl">
+          <div className="mx-auto mt-8 max-w-2xl sm:mt-12">
             <Accordion type="single" collapsible className="space-y-3">
               {LANDING_FAQS.map((faq, i) => (
                 <AnimateOnScroll key={i} preset="fadeUp" delay={i * 0.05}>
@@ -818,7 +818,7 @@ function GuestLanding() {
                 </AnimateOnScroll>
               ))}
             </Accordion>
-            <div className="mt-8 text-center">
+            <div className="mt-6 text-center sm:mt-8">
               <Link to="/faq" className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 shadow-soft transition-all hover:border-brand-300 hover:shadow-lift">
                 View All FAQs <ArrowRight className="size-4" />
               </Link>
@@ -837,9 +837,9 @@ function GuestLanding() {
       />
 
       {/* ════════════════════════════ FINAL CTA ════════════════════════════ */}
-      <section className="container-x py-20">
+      <section className="container-x py-12 sm:py-16 lg:py-20">
         <AnimateOnScroll preset="scaleUp">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-600 p-8 shadow-lift sm:p-14">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-600 p-6 shadow-lift sm:rounded-3xl sm:p-14">
             <CtaCinematicBg />
 
             <div className="relative mx-auto max-w-2xl text-center text-white">
@@ -849,7 +849,7 @@ function GuestLanding() {
               <p className="mt-4 text-sm leading-relaxed text-brand-100">
                 Give your employees an easier way to travel while giving your business greater control over bookings, policies, expenses and travel spending.
               </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-8 sm:gap-4">
                 <MagneticButton
                   onClick={() => navigate('/register')}
                   className="flex h-12 items-center gap-2 rounded-xl bg-white px-7 text-sm font-bold text-brand-700 shadow-lg transition-all hover:bg-brand-50"
@@ -863,7 +863,7 @@ function GuestLanding() {
                   Talk to Our Travel Team <ArrowRight className="size-4" />
                 </MagneticButton>
               </div>
-              <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-sun-300">
+              <p className="mt-4 text-[10px] font-semibold uppercase tracking-widest text-sun-300 sm:mt-6 sm:text-xs">
                 Travel smarter. Manage better. Move your business forward.
               </p>
             </div>
@@ -919,7 +919,7 @@ function UpcomingTripCard({ req }) {
 function QuickActions() {
   return (
     <Card>
-      <CardContent className="p-5">
+      <CardContent className="p-4 sm:p-5">
         <p className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-900">
           <Sparkles className="size-4 text-brand-600" /> Quick actions
         </p>
@@ -961,7 +961,7 @@ function MyPolicyCard() {
   const policy = policies?.find((p) => p.designation === user?.designation) || policies?.find((p) => p.grade === user?.grade)
   return (
     <Card>
-      <CardContent className="p-5">
+      <CardContent className="p-4 sm:p-5">
         <p className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900">
           <ShieldCheck className="size-4 text-emerald-600" /> My travel policy
         </p>
@@ -1068,7 +1068,7 @@ function EmployeeDashboard({ requests }) {
             <UpcomingTripCard req={upcoming[0]} />
             {pending.length > 0 && (
               <Card>
-                <CardContent className="p-5">
+                <CardContent className="p-4 sm:p-5">
                   <div className="mb-3 flex items-center justify-between">
                     <p className="flex items-center gap-2 text-sm font-bold text-slate-900"><Clock className="size-4 text-amber-600" /> Pending approval</p>
                     <Link to="/my-trips?tab=pending" className="text-xs font-semibold text-brand-700 hover:underline">View all</Link>
@@ -1079,7 +1079,7 @@ function EmployeeDashboard({ requests }) {
             )}
             {recent.length > 0 && (
               <Card>
-                <CardContent className="p-5">
+                <CardContent className="p-4 sm:p-5">
                   <div className="mb-3 flex items-center justify-between">
                     <p className="flex items-center gap-2 text-sm font-bold text-slate-900"><Plane className="size-4 text-brand-600" /> Recent trips</p>
                     <Link to="/my-trips" className="text-xs font-semibold text-brand-700 hover:underline">View all</Link>
@@ -1117,7 +1117,7 @@ function ApproverOverview({ requests }) {
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           <Card className="lg:col-span-2">
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <div className="mb-3 flex items-center justify-between">
                 <p className="flex items-center gap-2 text-sm font-bold text-slate-900"><ClipboardList className="size-4 text-brand-600" /> Requests awaiting your approval</p>
                 <Link to="/approvals" className="text-xs font-semibold text-brand-700 hover:underline">Open approvals</Link>
@@ -1130,7 +1130,7 @@ function ApproverOverview({ requests }) {
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <p className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900"><Users className="size-4 text-brand-600" /> Team travel activity</p>
               <div className="space-y-2.5 text-sm">
                 {requests.slice(0, 4).map((r) => (
@@ -1184,7 +1184,7 @@ function FinanceOverview({ requests, claims }) {
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           <Card className="lg:col-span-2">
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <div className="mb-3 flex items-center justify-between">
                 <p className="flex items-center gap-2 text-sm font-bold text-slate-900"><Receipt className="size-4 text-brand-600" /> Claims awaiting review</p>
                 <Link to="/claims" className="text-xs font-semibold text-brand-700 hover:underline">Open queue</Link>
@@ -1208,7 +1208,7 @@ function FinanceOverview({ requests, claims }) {
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <p className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900"><Banknote className="size-4 text-brand-600" /> Recent decisions</p>
               {recentDecisions.length === 0 ? (
                 <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">No decisions yet.</p>
@@ -1259,7 +1259,7 @@ function AdminOverview({ requests }) {
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <p className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900"><MapPin className="size-4 text-brand-600" /> Most travelled city</p>
               {maxCity ? (
                 <>
@@ -1270,7 +1270,7 @@ function AdminOverview({ requests }) {
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <p className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900"><Plane className="size-4 text-brand-600" /> Trips by status</p>
               <div className="space-y-2.5">
                 {Object.entries(stats.byStatus).map(([status, count]) => (
@@ -1286,7 +1286,7 @@ function AdminOverview({ requests }) {
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <p className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900"><Wallet className="size-4 text-brand-600" /> Spend by month</p>
               <div className="flex h-32 items-end gap-2">
                 {stats.byMonth.map((m) => (

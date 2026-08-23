@@ -160,9 +160,9 @@ export default function Checkout() {
 
   return (
     <div className="bg-slate-50 pb-28 lg:pb-0">
-      <div className="container-x py-8">
-        {/* Stepper */}
-        <div className="mb-8 hidden items-center justify-center gap-2 sm:flex">
+      <div className="container-x py-6 sm:py-8">
+        {/* Stepper - desktop */}
+        <div className="mb-6 hidden items-center justify-center gap-2 sm:flex sm:mb-8">
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
               <span className={cn(
@@ -176,7 +176,8 @@ export default function Checkout() {
             </div>
           ))}
         </div>
-        <p className="mb-6 flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 sm:hidden">
+        {/* Stepper - mobile */}
+        <p className="mb-4 flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 sm:hidden">
           Step {step + 1} of 6 · <span className="text-brand-700">{STEPS[step]}</span>
         </p>
 
@@ -197,19 +198,19 @@ export default function Checkout() {
                       type="button"
                       onClick={() => setSelected((s) => ({ ...s, [a.id]: !s[a.id] }))}
                       className={cn(
-                        'flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all',
+                        'flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-all sm:gap-4 sm:p-4',
                         selected[a.id] ? 'border-brand-500 bg-brand-50/50 ring-2 ring-brand-500/20' : 'border-slate-200 hover:border-slate-300',
                       )}
                     >
-                      <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', selected[a.id] ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-500')}>
-                        <a.icon className="size-5" />
+                      <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-xl sm:size-10', selected[a.id] ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-500')}>
+                        <a.icon className="size-4 sm:size-5" />
                       </span>
-                      <span className="flex-1">
-                        <span className="block text-sm font-bold text-slate-800">{a.name}</span>
-                        <span className="block text-xs text-slate-500">{a.desc}</span>
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-xs font-bold text-slate-800 sm:text-sm">{a.name}</span>
+                        <span className="block text-[11px] text-slate-500 sm:text-xs">{a.desc}</span>
                       </span>
-                      <span className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-slate-900">{fmt(a.price)}</span>
+                      <span className="flex shrink-0 items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 sm:text-sm">{fmt(a.price)}</span>
                         <span className={cn('flex size-5 items-center justify-center rounded-full border-2', selected[a.id] ? 'border-brand-600 bg-brand-600' : 'border-slate-300')}>
                           {selected[a.id] && <Check className="size-3 text-white" />}
                         </span>
@@ -230,7 +231,7 @@ export default function Checkout() {
                   <CardTitle className="flex items-center gap-2"><CreditCard className="size-5 text-brand-600" /> Payment method</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
                     {[
                       { id: 'card', label: 'Card', icon: CreditCard },
                       { id: 'upi', label: 'UPI', icon: Smartphone },
@@ -242,11 +243,11 @@ export default function Checkout() {
                         type="button"
                         onClick={() => setMethod(m.id)}
                         className={cn(
-                          'flex flex-col items-center gap-2 rounded-2xl border p-4 text-sm font-semibold transition-all',
+                          'flex flex-col items-center gap-1.5 rounded-2xl border p-3 text-xs font-semibold transition-all sm:gap-2 sm:p-4 sm:text-sm',
                           method === m.id ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-500/20' : 'border-slate-200 text-slate-600 hover:border-slate-300',
                         )}
                       >
-                        <m.icon className="size-5" /> {m.label}
+                        <m.icon className="size-4 sm:size-5" /> {m.label}
                       </button>
                     ))}
                   </div>
@@ -320,13 +321,13 @@ export default function Checkout() {
           {/* Fare summary */}
           <aside className="lg:sticky lg:top-24 lg:h-fit">
             <Card className="overflow-hidden">
-              <div className="bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 p-5 text-white">
+              <div className="bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 p-4 text-white sm:p-5">
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-200">Fare summary</p>
-                <p className="mt-1 font-display text-lg font-semibold">{kind === 'hotel' ? item.hotel.name : kind === 'package' ? item.name : `${item.airline} ${item.flightNumber}`}</p>
+                <p className="mt-1 font-display text-base font-semibold sm:text-lg">{kind === 'hotel' ? item.hotel.name : kind === 'package' ? item.name : `${item.airline} ${item.flightNumber}`}</p>
                 {kind === 'flight' && <p className="text-xs text-brand-100">{item.origin.code} → {item.destination.code} · {item.cabin} · {item.leg}</p>}
                 {kind === 'hotel' && <p className="text-xs text-brand-100">{item.room.name} · 2 nights</p>}
               </div>
-              <div className="space-y-3 p-5 text-sm">
+              <div className="space-y-3 p-4 text-sm sm:p-5">
                 <div className="flex justify-between"><span className="text-slate-500">Base fare</span><span className="font-semibold text-slate-800">{fmt(fares.base)}</span></div>
                 <div className="flex justify-between"><span className="text-slate-500">Taxes & fees</span><span className="font-semibold text-slate-800">{fmt(fares.taxes)}</span></div>
                 {fares.addons > 0 && (
@@ -338,7 +339,7 @@ export default function Checkout() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-slate-800">Total payable</span>
-                  <span className="text-2xl font-bold text-slate-900">{fmt(fares.total)}</span>
+                  <span className="text-xl font-bold text-slate-900 sm:text-2xl">{fmt(fares.total)}</span>
                 </div>
                 {passengers.length > 0 && (
                   <p className="rounded-lg bg-slate-50 p-2.5 text-xs text-slate-500">
@@ -351,8 +352,8 @@ export default function Checkout() {
                   <p className="mb-1.5 text-xs font-semibold text-slate-600">Have a promo code?</p>
                   <div className="flex gap-2">
                     <Input value={promoInput} onChange={(e) => setPromoInput(e.target.value)} placeholder="e.g. SUNRISE25" className="h-10 uppercase" />
-                    <Button variant="secondary" size="sm" className="h-10" onClick={applyPromo} disabled={promoLoading}>
-                      {promoLoading ? <Loader2 className="size-3.5 animate-spin" /> : <Ticket className="size-3.5" />} Apply
+                    <Button variant="secondary" size="sm" className="h-10 shrink-0" onClick={applyPromo} disabled={promoLoading}>
+                      {promoLoading ? <Loader2 className="size-3.5 animate-spin" /> : <Ticket className="size-3.5" />} <span className="hidden sm:inline">Apply</span>
                     </Button>
                   </div>
                   {promo && <p className="mt-1.5 text-xs font-semibold text-emerald-600">✓ {promo.label} applied to your booking</p>}

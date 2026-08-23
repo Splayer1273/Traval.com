@@ -37,18 +37,18 @@ export default function AccountLayout() {
 
   return (
     <div className="bg-slate-50">
-      <div className="container-x py-8">
+      <div className="container-x py-6 sm:py-8">
         {/* Header */}
-        <div className="mb-6 flex flex-wrap items-center gap-4 rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 p-6 text-white shadow-lift">
-          <Avatar className="size-16 border-2 border-white/40">
+        <div className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-brand-500 p-4 text-white shadow-lift sm:gap-4 sm:p-6">
+          <Avatar className="size-12 border-2 border-white/40 sm:size-16">
             {user?.avatar ? <img src={user.avatar} alt={user.firstName} className="size-full object-cover" /> : null}
-            <AvatarFallback className="text-xl">{initials}</AvatarFallback>
+            <AvatarFallback className="text-lg sm:text-xl">{initials}</AvatarFallback>
           </Avatar>
-          <div className="flex-1">
-            <h1 className="font-display text-2xl font-semibold">
+          <div className="min-w-0 flex-1">
+            <h1 className="font-display text-lg font-semibold sm:text-2xl">
               Welcome back, {user?.firstName || 'Traveller'} 👋
             </h1>
-            <p className="text-sm text-brand-100">Member since {user?.memberSince ? new Date(user.memberSince).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : '2024'}</p>
+            <p className="text-xs text-brand-100 sm:text-sm">Member since {user?.memberSince ? new Date(user.memberSince).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : '2024'}</p>
           </div>
           <div className="hidden gap-6 text-center sm:flex">
             <div><p className="font-display text-2xl font-bold">3</p><p className="text-xs text-brand-200">Upcoming trips</p></div>
@@ -58,10 +58,10 @@ export default function AccountLayout() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-          {/* Sidebar */}
+          {/* Sidebar - horizontal scroll on mobile, vertical on lg+ */}
           <aside className="lg:sticky lg:top-24 lg:h-fit">
-            <nav className="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-3 shadow-card lg:overflow-visible">
-              <div className="flex gap-1 lg:flex-col">
+            <nav className="-mx-4 overflow-x-auto px-4 pb-2 scrollbar-hide sm:mx-0 sm:rounded-2xl sm:border sm:border-slate-200 sm:bg-white sm:p-3 sm:shadow-card sm:overflow-visible">
+              <div className="flex gap-1 sm:flex-col">
                 {NAV.map((item) => (
                   <NavLink
                     key={item.to}
@@ -69,22 +69,22 @@ export default function AccountLayout() {
                     end={item.end}
                     className={({ isActive }) =>
                       cn(
-                        'flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-colors',
+                        'flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors sm:gap-2.5 sm:px-3.5 sm:text-sm',
                         isActive
                           ? 'bg-brand-600 text-white shadow-glow'
                           : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
                       )
                     }
                   >
-                    <item.icon className="size-4" /> {item.label}
+                    <item.icon className="size-3.5 sm:size-4" /> {item.label}
                   </NavLink>
                 ))}
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 lg:mt-1"
+                  className="flex shrink-0 items-center gap-2 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-50 sm:gap-2.5 sm:px-3.5 sm:text-sm lg:mt-1"
                 >
-                  <LogOut className="size-4" /> Logout
+                  <LogOut className="size-3.5 sm:size-4" /> Logout
                 </button>
               </div>
             </nav>

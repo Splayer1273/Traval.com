@@ -111,7 +111,7 @@ export default function Navbar() {
         scrolled ? 'border-slate-200/80 shadow-[0_4px_24px_-12px_rgb(15_23_42/0.18)]' : 'border-slate-200/60',
       )}
     >
-      <div className="container-x flex h-16 items-center justify-between gap-3 sm:h-[72px]">
+      <div className="container-x flex h-14 items-center justify-between gap-2 sm:h-16 sm:gap-3 lg:h-[72px]">
         {/* Mobile menu */}
         <Sheet>
           <SheetTrigger asChild>
@@ -253,7 +253,7 @@ export default function Navbar() {
         </nav>
 
         {/* Right controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
           {/* Notifications */}
           <DropdownMenu open={notifOpen} onOpenChange={setNotifOpen}>
             <DropdownMenuTrigger asChild>
@@ -266,7 +266,7 @@ export default function Navbar() {
                 )}
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuContent align="end" className="w-80 max-w-[calc(100vw-2rem)]">
               <DropdownMenuLabel className="flex items-center justify-between">
                 Notifications
                 {unread > 0 && (
@@ -301,8 +301,8 @@ export default function Navbar() {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full p-1 pr-2 transition-colors hover:bg-slate-100">
-                  <Avatar className="size-9">
+                <button className="flex items-center gap-2 rounded-full p-1 pr-1.5 transition-colors hover:bg-slate-100 sm:pr-2">
+                  <Avatar className="size-8 sm:size-9">
                     {user?.avatar ? <img src={user.avatar} alt={user.firstName} className="size-full object-cover" /> : null}
                     <AvatarFallback>{initials || 'U'}</AvatarFallback>
                   </Avatar>

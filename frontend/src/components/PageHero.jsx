@@ -9,7 +9,7 @@ export default function PageHero({ image = 'city', title, subtitle, crumb }) {
         <Img src={image} alt="" className="absolute inset-0" imgClassName="opacity-40" eager />
         <div className="absolute inset-0 hero-overlay" />
       </div>
-      <div className="container-x relative flex min-h-52 flex-col justify-center py-14 sm:min-h-64">
+      <div className="container-x relative flex min-h-40 flex-col justify-center py-10 sm:min-h-52 sm:py-14 lg:min-h-64">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -18,7 +18,7 @@ export default function PageHero({ image = 'city', title, subtitle, crumb }) {
           <Breadcrumb crumb={crumb} light />
         </motion.div>
         <motion.h1
-          className="mt-3 max-w-2xl font-display text-3xl font-semibold text-white sm:text-4xl"
+          className="mt-3 max-w-2xl font-display text-2xl font-semibold text-white sm:text-3xl lg:text-4xl"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}

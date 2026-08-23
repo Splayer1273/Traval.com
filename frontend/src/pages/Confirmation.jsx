@@ -1,8 +1,9 @@
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
-  CheckCircle2, Download, Luggage, Home, Plane, CreditCard, UserRound, MapPin, Calendar,
+  CheckCircle2, Download, Luggage, Home, Plane, CreditCard, UserRound, MapPin, Calendar, Loader2,
 } from 'lucide-react'
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card.jsx'
 import { Button } from '../components/ui/button.jsx'
 import { Badge } from '../components/ui/badge.jsx'
@@ -10,16 +11,35 @@ import { Skeleton } from '../components/ui/skeleton.jsx'
 import { bookingApi } from '../services/bookingApi.js'
 import { useToast } from '../context/ToastContext.jsx'
 import { formatDate, formatTime, fullName } from '../utils/format.js'
+import { downloadTicket } from '../utils/generateTicket.js'
 
 export default function Confirmation() {
   const { id } = useParams()
-  const { toast } = useToast()
+  const { toast, error: showError } = useToast()
   const { data: b, isLoading } = useQuery({
     queryKey: ['booking', id],
     queryFn: () => bookingApi.getBooking(id),
   })
 
-  const download = (what) => toast(`${what} for ${b?.pnr} downloaded. A copy is also in your inbox.`, 'Download')
+  const [downloading, setDownloading] = useState(null)
+
+  const handleDownload = async (type) => {
+    if (!b) return
+    setDownloading(type)
+    try {
+      const result = downloadTicket(b, type)
+      if (result.success) {
+        toast(`${type === 'invoice' ? 'Invoice' : 'E-ticket'} downloaded successfully.`, 'Download')
+      } else {
+        showError(`Unable to download your ${type === 'invoice' ? 'invoice' : 'e-ticket'}. Please try again.`, 'Download failed')
+      }
+    } catch (err) {
+      console.error('Download error:', err)
+      showError(`Unable to download your ${type === 'invoice' ? 'invoice' : 'e-ticket'}. Please try again.`, 'Download failed')
+    } finally {
+      setDownloading(null)
+    }
+  }
 
   if (isLoading) return <div className="container-x py-10"><Skeleton className="h-96 w-full rounded-2xl" /></div>
   if (!b) {
@@ -46,8 +66,14 @@ export default function Confirmation() {
             A confirmation email with your e-ticket has been sent to your inbox.
           </p>
           <div className="mt-6 flex animate-fade-up flex-wrap items-center justify-center gap-3" style={{ animationDelay: '160ms' }}>
-            <Button variant="secondary" onClick={() => download('E-ticket')}><Download className="size-4" /> Download Ticket</Button>
-            <Button variant="secondary" onClick={() => download('Invoice')}><Download className="size-4" /> Download Invoice</Button>
+            <Button variant="secondary" onClick={() => handleDownload('ticket')} disabled={downloading === 'ticket'}>
+              {downloading === 'ticket' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+              {downloading === 'ticket' ? 'Generating…' : 'Download E-Ticket'}
+            </Button>
+            <Button variant="secondary" onClick={() => handleDownload('invoice')} disabled={downloading === 'invoice'}>
+              {downloading === 'invoice' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+              {downloading === 'invoice' ? 'Generating…' : 'Download Invoice'}
+            </Button>
             <Button asChild><a href="/my-trips"><Luggage className="size-4" /> View My Trips</a></Button>
             <Button variant="ghost" asChild><a href="/"><Home className="size-4" /> Return Home</a></Button>
           </div>
@@ -158,8 +184,14 @@ export default function Confirmation() {
           </Card>
 
           <div className="flex flex-wrap justify-center gap-3 pb-8">
-            <Button variant="secondary" onClick={() => download('E-ticket')}><Download className="size-4" /> Download Ticket</Button>
-            <Button variant="secondary" onClick={() => download('Invoice')}><Download className="size-4" /> Download Invoice</Button>
+            <Button variant="secondary" onClick={() => handleDownload('ticket')} disabled={downloading === 'ticket'}>
+              {downloading === 'ticket' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+              {downloading === 'ticket' ? 'Generating…' : 'Download E-Ticket'}
+            </Button>
+            <Button variant="secondary" onClick={() => handleDownload('invoice')} disabled={downloading === 'invoice'}>
+              {downloading === 'invoice' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+              {downloading === 'invoice' ? 'Generating…' : 'Download Invoice'}
+            </Button>
             <Button asChild><a href="/my-trips"><Luggage className="size-4" /> View My Trips</a></Button>
           </div>
         </div>

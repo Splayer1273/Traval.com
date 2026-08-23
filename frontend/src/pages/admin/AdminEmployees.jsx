@@ -78,23 +78,23 @@ export default function AdminEmployees() {
   return (
     <div className="bg-slate-50">
       <div className="border-b border-slate-200 bg-white">
-        <div className="container-x py-8">
+        <div className="container-x py-6 sm:py-8">
           <p className="flex items-center gap-2 text-sm font-semibold text-slate-500">
             <Users className="size-4 text-brand-600" /> People directory
           </p>
-          <h1 className="mt-1.5 font-display text-3xl font-semibold text-slate-900 sm:text-4xl">Employees</h1>
+          <h1 className="mt-1.5 font-display text-2xl font-semibold text-slate-900 sm:text-3xl lg:text-4xl">Employees</h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-500">
             Company directory with designations, travel grades and managers. Roles drive what each user sees in the portal.
           </p>
-          <div className="mt-5"><AdminNav /></div>
+          <div className="mt-4 sm:mt-5"><AdminNav /></div>
         </div>
       </div>
 
-      <div className="container-x py-8">
+      <div className="container-x py-6 sm:py-8">
         <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
           <aside className="space-y-4 lg:sticky lg:top-24 lg:h-fit">
             <Card>
-              <CardContent className="p-5">
+              <CardContent className="p-4 sm:p-5">
                 <p className="mb-3 text-sm font-bold text-slate-900">Departments</p>
                 <div className="space-y-1">
                   <button type="button" onClick={() => setDept('all')} className={cn('flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold transition-colors', dept === 'all' ? 'bg-brand-600 text-white' : 'text-slate-600 hover:bg-slate-100')}>
@@ -109,7 +109,7 @@ export default function AdminEmployees() {
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="p-5 text-xs leading-relaxed text-slate-500">
+              <CardContent className="p-4 sm:p-5 text-xs leading-relaxed text-slate-500">
                 <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-slate-800"><ShieldCheck className="size-4 text-brand-600" /> Access control</p>
                 Employees see only their own requests. Approvers see the full company queue. Admins manage policies, employees and all bookings.
               </CardContent>
@@ -123,24 +123,24 @@ export default function AdminEmployees() {
             </div>
 
             {isLoading ? (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-56 rounded-2xl" />)}</div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-56 rounded-2xl" />)}</div>
             ) : filtered.length === 0 ? (
               <p className="rounded-2xl border border-dashed border-slate-300 p-10 text-center text-sm text-slate-500">No employees match your search.</p>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((u) => {
                   const role = ROLE_BADGE[u.role] || ROLE_BADGE.employee
                   return (
                     <Card key={u.id} className="transition-all hover:-translate-y-0.5 hover:shadow-lift">
-                      <CardContent className="p-5">
+                      <CardContent className="p-4 sm:p-5">
                         <div className="flex items-start justify-between gap-2">
-                          <span className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-sun-500 text-base font-bold text-white">
+                          <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-sun-500 text-base font-bold text-white sm:size-11">
                             {u.firstName[0]}{u.lastName[0]}
                           </span>
                           <Badge variant={role.variant}>{role.label}</Badge>
                         </div>
-                        <p className="mt-3 font-display text-base font-semibold text-slate-900">{u.firstName} {u.lastName}</p>
-                        <p className="text-xs text-slate-400">{u.employeeId} · {u.email}</p>
+                        <p className="mt-3 font-display text-sm font-semibold text-slate-900 sm:text-base">{u.firstName} {u.lastName}</p>
+                        <p className="text-[11px] text-slate-400 sm:text-xs">{u.employeeId} · {u.email}</p>
                         <div className="mt-3 space-y-1.5 rounded-xl bg-slate-50 p-3 text-xs">
                           <p className="flex justify-between"><span className="text-slate-400">Designation</span><span className="font-semibold text-slate-700">{u.designation}</span></p>
                           <p className="flex justify-between"><span className="text-slate-400">Grade</span><span className="font-semibold text-slate-700">Grade {u.grade}</span></p>
@@ -148,7 +148,7 @@ export default function AdminEmployees() {
                           <p className="flex justify-between"><span className="text-slate-400">Manager</span><span className="font-semibold text-slate-700">{u.manager}</span></p>
                           <p className="flex justify-between"><span className="text-slate-400">Cost centre</span><span className="font-semibold text-slate-700">{u.costCenter}</span></p>
                         </div>
-                        <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-500"><Mail className="size-3.5" /> {u.email}</p>
+                        <p className="mt-3 flex items-center gap-1.5 text-[11px] text-slate-500 sm:text-xs"><Mail className="size-3.5" /> {u.email}</p>
                       </CardContent>
                     </Card>
                   )

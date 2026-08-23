@@ -53,7 +53,7 @@ export default function AdminPolicies() {
 
   if (isLoading || !draft) {
     return (
-      <div className="container-x py-8 space-y-4">
+      <div className="container-x space-y-4 py-8">
         <Skeleton className="h-14 w-64 rounded-xl" />
         <Skeleton className="h-96 w-full rounded-2xl" />
       </div>
@@ -65,33 +65,33 @@ export default function AdminPolicies() {
   return (
     <div className="bg-slate-50">
       <div className="border-b border-slate-200 bg-white">
-        <div className="container-x py-8">
+        <div className="container-x py-6 sm:py-8">
           <p className="flex items-center gap-2 text-sm font-semibold text-slate-500">
             <ShieldCheck className="size-4 text-brand-600" /> Policy configuration
           </p>
-          <h1 className="mt-1.5 font-display text-3xl font-semibold text-slate-900 sm:text-4xl">Travel policies</h1>
+          <h1 className="mt-1.5 font-display text-2xl font-semibold text-slate-900 sm:text-3xl lg:text-4xl">Travel policies</h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-500">
             Entitlements per designation. The policy engine checks every flight and hotel selection against these rules — changes apply immediately.
           </p>
-          <div className="mt-5"><AdminNav /></div>
+          <div className="mt-4 sm:mt-5"><AdminNav /></div>
         </div>
       </div>
 
-      <div className="container-x py-8">
+      <div className="container-x py-6 sm:py-8">
         <Card className="overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4 sm:px-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-3 sm:p-4 sm:px-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
               <Badge variant={dirty ? 'warning' : 'success'}>{dirty ? 'Unsaved changes' : 'Live'}</Badge>
-              <span className="text-slate-400">Designation-based entitlements</span>
+              <span className="hidden text-slate-400 sm:inline">Designation-based entitlements</span>
             </div>
             <div className="flex gap-2">
-              <Button variant="secondary" size="sm" onClick={reset}><RotateCcw className="size-3.5" /> Reset defaults</Button>
+              <Button variant="secondary" size="sm" onClick={reset}><RotateCcw className="size-3.5" /> <span className="hidden sm:inline">Reset defaults</span><span className="sm:hidden">Reset</span></Button>
               <Button size="sm" disabled={!dirty || saveMutation.isPending} onClick={() => saveMutation.mutate(draft)}>
-                {saveMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />} Save policies
+                {saveMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />} <span className="hidden sm:inline">Save policies</span><span className="sm:hidden">Save</span>
               </Button>
             </div>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 table-scroll-wrapper">
             <table className="w-full min-w-[820px] text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/70 text-left text-[11px] font-bold uppercase tracking-wide text-slate-400">
@@ -114,7 +114,7 @@ export default function AdminPolicies() {
                     <td className="px-3 py-3"><Badge variant="secondary">Grade {p.grade}</Badge></td>
                     <td className="px-3 py-3">
                       <Select value={p.flightClass} onValueChange={(v) => update(p.id, { flightClass: v, premiumEconomy: v !== 'Economy', business: v === 'Business' || v === 'First Class' })}>
-                        <SelectTrigger className="h-9 w-40 bg-white text-xs shadow-none"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-9 w-32 bg-white text-xs shadow-none sm:w-40"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           {CABINS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                         </SelectContent>
@@ -129,7 +129,7 @@ export default function AdminPolicies() {
                       </Select>
                     </td>
                     <td className="px-3 py-3">
-                      <div className="relative w-32">
+                      <div className="relative w-28 sm:w-32">
                         <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">₹</span>
                         <input
                           type="number"
@@ -142,7 +142,7 @@ export default function AdminPolicies() {
                       </div>
                     </td>
                     <td className="px-3 py-3">
-                      <div className="relative w-28">
+                      <div className="relative w-24 sm:w-28">
                         <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">₹</span>
                         <input
                           type="number"
@@ -169,7 +169,7 @@ export default function AdminPolicies() {
               </tbody>
             </table>
           </div>
-          <div className="border-t border-slate-100 bg-slate-50/60 px-5 py-3 text-xs text-slate-500">
+          <div className="border-t border-slate-100 bg-slate-50/60 px-4 py-3 text-xs text-slate-500 sm:px-5">
             Employees see their own entitlement when searching. Options above the limit remain visible but are flagged <span className="font-semibold text-amber-600">outside policy</span> and require approver justification.
           </div>
         </Card>

@@ -78,7 +78,7 @@ export default function MobileBottomNav() {
             end={t.end}
             className={({ isActive }) =>
               cn(
-                'group relative flex flex-col items-center gap-1 py-2 text-[10px] font-semibold transition-colors',
+                'group relative flex flex-col items-center gap-0.5 py-1.5 text-[10px] font-semibold transition-colors min-h-[56px] justify-center',
                 isActive ? 'text-brand-700' : 'text-slate-400',
               )
             }
@@ -93,13 +93,13 @@ export default function MobileBottomNav() {
                 />
                 <span
                   className={cn(
-                    'flex size-7 items-center justify-center rounded-full transition-all duration-300',
+                    'flex size-8 items-center justify-center rounded-full transition-all duration-300',
                     isActive ? 'bg-brand-50' : 'bg-transparent group-active:bg-slate-100',
                   )}
                 >
                   <t.icon className={cn('size-5 transition-transform duration-300', isActive && '-translate-y-px scale-105')} />
                 </span>
-                <span className={cn(isActive && 'font-bold')}>{t.label}</span>
+                <span className={cn('text-[10px]', isActive && 'font-bold')}>{t.label}</span>
               </>
             )}
           </NavLink>

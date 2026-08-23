@@ -12,7 +12,7 @@ const FEATURES = [
 export default function AuthLayout({ title, subtitle, children, footer }) {
   return (
     <div className="grid min-h-screen bg-white lg:grid-cols-2">
-      {/* Brand panel */}
+      {/* Brand panel - hidden on mobile, visible on lg+ */}
       <div className="relative hidden overflow-hidden lg:block">
         <Img src="plane" alt="AkbarBizvoy corporate travel" className="absolute inset-0" eager />
         <div className="absolute inset-0 bg-gradient-to-br from-brand-950/90 via-slate-950/70 to-sun-700/60" />
@@ -44,14 +44,24 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
       </div>
 
       {/* Form panel */}
-      <div className="flex flex-col justify-center px-5 py-10 sm:px-10 lg:px-16">
-        <Link to="/" className="mb-8 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 transition-colors hover:text-brand-700">
+      <div className="flex flex-col justify-center px-5 py-8 sm:px-8 sm:py-10 lg:px-16">
+        {/* Mobile header - only shown on mobile */}
+        <div className="mb-6 flex items-center justify-between lg:hidden">
+          <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 transition-colors hover:text-brand-700">
+            <ArrowLeft className="size-4" /> Home
+          </Link>
+          <Logo small />
+        </div>
+        
+        {/* Desktop back link */}
+        <Link to="/" className="mb-8 hidden items-center gap-1.5 text-sm font-semibold text-slate-500 transition-colors hover:text-brand-700 lg:inline-flex">
           <ArrowLeft className="size-4" /> Back to home
         </Link>
+        
         <div className="mx-auto w-full max-w-md">
-          <h1 className="font-display text-3xl font-semibold text-slate-900">{title}</h1>
+          <h1 className="font-display text-2xl font-semibold text-slate-900 sm:text-3xl">{title}</h1>
           {subtitle && <p className="mt-2 text-sm text-slate-500">{subtitle}</p>}
-          <div className="mt-8">{children}</div>
+          <div className="mt-6 sm:mt-8">{children}</div>
           {footer && <div className="mt-6 text-center text-sm text-slate-500">{footer}</div>}
         </div>
       </div>

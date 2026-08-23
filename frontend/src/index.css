@@ -175,6 +175,85 @@ body {
   -webkit-backdrop-filter: blur(14px);
 }
 
+/* ── Responsive typography utilities ── */
+@utility text-display-responsive {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  line-height: 1.15;
+}
+
+@utility text-h1-responsive {
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  line-height: 1.15;
+}
+
+@utility text-h2-responsive {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  line-height: 1.2;
+}
+
+@utility text-h3-responsive {
+  font-size: clamp(1.25rem, 3vw, 1.875rem);
+  line-height: 1.3;
+}
+
+@utility text-body-responsive {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  line-height: 1.6;
+}
+
+@utility text-small-responsive {
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  line-height: 1.5;
+}
+
+/* ── Responsive section spacing ── */
+@utility section-padding {
+  padding-top: clamp(2rem, 5vw, 5rem);
+  padding-bottom: clamp(2rem, 5vw, 5rem);
+}
+
+@utility section-padding-lg {
+  padding-top: clamp(3rem, 8vw, 8rem);
+  padding-bottom: clamp(3rem, 8vw, 8rem);
+}
+
+/* ── Prevent horizontal overflow on containers ── */
+@utility no-overflow-x {
+  overflow-x: hidden;
+}
+
+/* ── Responsive grid helpers ── */
+@utility responsive-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.25rem;
+}
+
+@utility responsive-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.25rem;
+}
+
+@utility responsive-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.25rem;
+}
+
+/* Responsive grid 2 columns */
+@media (min-width: 640px) {
+  .responsive-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .responsive-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .responsive-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Responsive grid 3+ columns */
+@media (min-width: 1024px) {
+  .responsive-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .responsive-grid-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
 /* ── Ken Burns cinematic animations for landing page backgrounds ── */
 @keyframes kenburns-0 {
   from { transform: scale(1.0) translate(0%, 0%); }
@@ -199,4 +278,46 @@ body {
 @keyframes kenburns-5 {
   from { transform: scale(1.0) translate(-1%, 1%); }
   to   { transform: scale(1.12) translate(1%, 0%); }
+}
+
+/* ── Global responsive body scroll guard ── */
+#root {
+  overflow-x: clip;
+  min-height: 100dvh;
+}
+
+/* ── Touch-friendly improvements for mobile ── */
+@media (max-width: 768px) {
+  /* Ensure minimum tap targets are 44x44px */
+  button, a, [role="button"] {
+    min-height: 44px;
+  }
+  
+  /* Improve input sizing on mobile */
+  input, select, textarea {
+    font-size: 16px !important; /* Prevent iOS zoom on focus */
+  }
+}
+
+/* ── Responsive table scroll hint ── */
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll-wrapper::after {
+  content: '';
+  position: sticky;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  background: linear-gradient(to right, transparent, rgb(248 250 252 / 0.9));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.table-scroll-wrapper[data-scrollable="true"]::after {
+  opacity: 1;
 }

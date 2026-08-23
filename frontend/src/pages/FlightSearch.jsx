@@ -147,8 +147,6 @@ export default function FlightSearch() {
           : sort === 'earliest' ? 'Earliest' : null
 
   // Deterministic per-date fares (demo) so the fare calendar feels real.
-  // The window is anchored to the FIRST searched date so tapping a tile moves
-  // the highlight without re-centering the strip under the user's finger.
   const anchorRef = useRef(null)
   if (hasSearched && !anchorRef.current) anchorRef.current = q.date
   const anchorDate = anchorRef.current || q.date || todayISO()
@@ -162,7 +160,7 @@ export default function FlightSearch() {
       const d = new Date(`${start}T00:00:00`)
       d.setDate(d.getDate() + i)
       const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-      const variance = (hash(iso) % 25) - 12 // -12% … +12%
+      const variance = (hash(iso) % 25) - 12
       const price = Math.round((minPrice * (1 + variance / 100)) / 100) * 100
       return { iso, weekday: formatDay(iso), day: d.getDate(), price }
     })
@@ -171,7 +169,6 @@ export default function FlightSearch() {
     return { days, cheapestIdx }
   }, [hasSearched, data, anchorDate])
 
-  // Quick airline chips (from the current result set).
   const quickAirlines = useMemo(() => {
     if (!data?.outbound?.length) return []
     const map = new Map()
@@ -183,7 +180,6 @@ export default function FlightSearch() {
     return [...map.values()]
   }, [data])
 
-  // Simple fare insight vs the route average.
   const fareInsight = useMemo(() => {
     if (!data?.outbound?.length) return null
     const prices = data.outbound.map((f) => f.price)
@@ -265,28 +261,28 @@ export default function FlightSearch() {
   const travellers = Number(q.adults || 1)
 
   return (
-    <div>
+    <div className="min-w-0 overflow-x-hidden">
       {/* Light, airy header */}
       <section className="border-b border-slate-200 bg-white">
         <div className="h-1 w-full bg-gradient-to-r from-brand-600 via-brand-500 to-sun-500" />
-        <div className="container-x py-6 sm:py-8">
+        <div className="container-x py-4 sm:py-6 lg:py-8">
           <Breadcrumb crumb={[{ label: 'Flights' }]} />
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-3">
-            <h1 className="font-display text-2xl font-semibold text-slate-900 sm:text-3xl">
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-2 sm:mt-3 sm:gap-x-3 sm:gap-y-3">
+            <h1 className="font-display text-xl font-semibold text-slate-900 sm:text-2xl lg:text-3xl">
               {hasSearched ? `${fromCity} → ${toCity}` : 'Find your next flight'}
             </h1>
             {hasSearched && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
-                  <CalendarDays className="size-3.5 text-brand-600" /> {formatDate(q.date)}
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
+                  <CalendarDays className="size-3 text-brand-600 sm:size-3.5" /> {formatDate(q.date)}
                 </span>
-                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700 sm:px-3 sm:py-1 sm:text-xs">
                   {travellers} {travellers > 1 ? 'travellers' : 'traveller'} · {q.cabin}
                 </span>
               </div>
             )}
           </div>
-          <p className="mt-1.5 text-sm text-slate-500">
+          <p className="mt-1 text-xs text-slate-500 sm:mt-1.5 sm:text-sm">
             {hasSearched
               ? 'Compare fares across 500+ airlines and book with confidence.'
               : 'Find the best fares across 500+ airlines and 2,000+ destinations.'}
@@ -295,39 +291,39 @@ export default function FlightSearch() {
       </section>
 
       {/* Search summary / form */}
-      <div className="container-x mt-6">
+      <div className="container-x mt-4 sm:mt-6">
         <div className="rounded-2xl bg-gradient-to-r from-brand-200 via-sun-200 to-brand-200 p-px shadow-lift">
-          <div className="rounded-[15px] bg-white p-4 sm:p-5">
+          <div className="rounded-[15px] bg-white p-3 sm:p-4 lg:p-5">
             <div className="flex flex-wrap items-center gap-2">
               <Select value={q.from || undefined} onValueChange={(v) => { params.set('from', v); setParams(params) }}>
-                <SelectTrigger className="w-36"><SelectValue placeholder="From" /></SelectTrigger>
+                <SelectTrigger className="h-9 w-[120px] text-xs sm:h-11 sm:w-36 sm:text-sm"><SelectValue placeholder="From" /></SelectTrigger>
                 <SelectContent>
                   {AIRPORTS.map((a) => <SelectItem key={a.code} value={a.code}>{a.code} — {a.city}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Button variant="ghost" size="icon" className="rounded-full" onClick={() => {
+              <Button variant="ghost" size="icon" className="size-8 rounded-full sm:size-10" onClick={() => {
                 params.set('from', q.to); params.set('to', q.from); setParams(params)
               }} aria-label="Swap">
-                <ArrowLeftRight className="size-4" />
+                <ArrowLeftRight className="size-3.5 sm:size-4" />
               </Button>
               <Select value={q.to || undefined} onValueChange={(v) => { params.set('to', v); setParams(params) }}>
-                <SelectTrigger className="w-36"><SelectValue placeholder="To" /></SelectTrigger>
+                <SelectTrigger className="h-9 w-[120px] text-xs sm:h-11 sm:w-36 sm:text-sm"><SelectValue placeholder="To" /></SelectTrigger>
                 <SelectContent>
                   {AIRPORTS.map((a) => <SelectItem key={a.code} value={a.code}>{a.code} — {a.city}</SelectItem>)}
                 </SelectContent>
               </Select>
               <div className="hidden h-9 w-px bg-slate-200 sm:block" />
-              <div className="ml-auto flex flex-wrap items-center gap-2">
-                <span className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
-                  <CalendarDays className="size-3.5 text-brand-600" /> {q.date ? formatDate(q.date) : 'Select date'}
+              <div className="ml-auto flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span className="flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-700 sm:gap-1.5 sm:px-3 sm:py-1.5 sm:text-xs">
+                  <CalendarDays className="size-3 text-brand-600 sm:size-3.5" /> {q.date ? formatDate(q.date) : 'Select date'}
                 </span>
-                <span className="flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">
-                  <Users className="size-3.5 text-brand-600" /> {travellers} {travellers > 1 ? 'travellers' : 'traveller'}
+                <span className="flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-700 sm:gap-1.5 sm:px-3 sm:py-1.5 sm:text-xs">
+                  <Users className="size-3 text-brand-600 sm:size-3.5" /> {travellers} {travellers > 1 ? 'travellers' : 'traveller'}
                 </span>
-                <Badge variant="secondary" className="px-3 py-1.5">{q.cabin}</Badge>
+                <Badge variant="secondary" className="px-2 py-0.5 text-[10px] sm:px-3 sm:py-1.5 sm:text-xs">{q.cabin}</Badge>
               </div>
             </div>
-            <p className="mt-3 text-xs text-slate-500">
+            <p className="mt-2 text-[10px] text-slate-500 sm:mt-3 sm:text-xs">
               Tip: try one of these popular routes —{' '}
               {POPULAR_ROUTES.slice(0, 4).map((r, i) => (
                 <span key={r.label}>
@@ -347,17 +343,17 @@ export default function FlightSearch() {
 
       {/* Fare calendar — cheapest nearby days */}
       {hasSearched && fareDates.days?.length > 0 && (
-        <div className="container-x mt-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card sm:p-5">
-            <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="container-x mt-4 sm:mt-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-card sm:p-4 lg:p-5">
+            <div className="mb-2 flex items-center justify-between gap-3 sm:mb-3">
               <div>
-                <p className="flex items-center gap-2 font-display text-base font-semibold text-slate-900">
+                <p className="flex items-center gap-2 font-display text-sm font-semibold text-slate-900 sm:text-base">
                   <CalendarDays className="size-4 text-brand-600" /> Fare calendar
                 </p>
-                <p className="text-xs text-slate-500">Lowest one-way fare for {toCity || q.to} — tap a date to view it.</p>
+                <p className="text-[10px] text-slate-500 sm:text-xs">Lowest one-way fare for {toCity || q.to} — tap a date to view it.</p>
               </div>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="-mx-3 flex gap-1.5 overflow-x-auto px-3 pb-1 scrollbar-hide sm:gap-2">
               {fareDates.days.map((d, i) => {
                 const selected = d.iso === q.date
                 const isCheapest = i === fareDates.cheapestIdx
@@ -368,7 +364,7 @@ export default function FlightSearch() {
                     aria-pressed={selected}
                     onClick={() => { params.set('date', d.iso); setParams(params) }}
                     className={cn(
-                      'flex min-w-16 shrink-0 flex-col items-center gap-0.5 rounded-xl border px-3 py-2 text-center transition-all',
+                      'flex min-w-[60px] shrink-0 flex-col items-center gap-0.5 rounded-xl border px-2 py-1.5 text-center transition-all sm:min-w-16 sm:px-3 sm:py-2',
                       selected
                         ? 'border-brand-600 bg-brand-600 text-white shadow-glow'
                         : isCheapest
@@ -376,13 +372,13 @@ export default function FlightSearch() {
                           : 'border-slate-200 bg-white text-slate-700 hover:border-brand-300',
                     )}
                   >
-                    <span className={cn('text-[10px] font-bold uppercase tracking-wide', selected ? 'text-white/80' : 'opacity-70')}>{d.weekday}</span>
-                    <span className="text-sm font-bold">{d.day}</span>
-                    <span className={cn('text-[11px] font-semibold', selected ? 'text-white' : 'text-slate-500')}>
+                    <span className={cn('text-[8px] font-bold uppercase tracking-wide sm:text-[10px]', selected ? 'text-white/80' : 'opacity-70')}>{d.weekday}</span>
+                    <span className="text-xs font-bold sm:text-sm">{d.day}</span>
+                    <span className={cn('text-[9px] font-semibold sm:text-[11px]', selected ? 'text-white' : 'text-slate-500')}>
                       ₹{d.price.toLocaleString('en-IN')}
                     </span>
                     {isCheapest && !selected && (
-                      <span className="rounded-full bg-emerald-500 px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-white">Cheapest</span>
+                      <span className="rounded-full bg-emerald-500 px-1 py-px text-[7px] font-bold uppercase tracking-wide text-white sm:px-1.5 sm:text-[9px]">Cheapest</span>
                     )}
                   </button>
                 )
@@ -394,19 +390,19 @@ export default function FlightSearch() {
 
       {/* Corporate trip context banner */}
       {params.get('corp') === '1' && travelDraft?.trip && (
-        <div className="container-x mt-6">
-          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-brand-200 bg-brand-50/60 p-4">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-brand-600 text-white"><Briefcase className="size-4" /></span>
+        <div className="container-x mt-4 sm:mt-6">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-brand-200 bg-brand-50/60 p-3 sm:gap-3 sm:p-4">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-brand-600 text-white sm:size-9"><Briefcase className="size-3.5 sm:size-4" /></span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-slate-800">Booking for business trip: {travelDraft.trip.title}</p>
-              <p className="text-xs text-slate-500">{travelDraft.trip.from} → {travelDraft.trip.destination} · {formatDate(travelDraft.trip.startDate)} – {formatDate(travelDraft.trip.endDate)} · {travelDraft.trip.travellers || 1} traveller — every option is checked against your corporate policy.</p>
+              <p className="text-xs font-bold text-slate-800 sm:text-sm">Booking for business trip: {travelDraft.trip.title}</p>
+              <p className="text-[10px] text-slate-500 sm:text-xs">{travelDraft.trip.from} → {travelDraft.trip.destination} · {formatDate(travelDraft.trip.startDate)} – {formatDate(travelDraft.trip.endDate)} · {travelDraft.trip.travellers || 1} traveller — every option is checked against your corporate policy.</p>
             </div>
-            <Link to="/trips/review" className="text-xs font-bold text-brand-700 hover:underline">Review request →</Link>
+            <Link to="/trips/review" className="text-[10px] font-bold text-brand-700 hover:underline sm:text-xs">Review request →</Link>
           </div>
         </div>
       )}
 
-      <div className="container-x mt-8">
+      <div className="container-x mt-6 sm:mt-8">
         {!hasSearched ? (
           <div className="mx-auto max-w-2xl">
             <EmptyState
@@ -421,21 +417,21 @@ export default function FlightSearch() {
             />
           </div>
         ) : isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5">
-                <div className="flex flex-wrap items-center gap-4">
+              <div key={i} className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                   <Skeleton className="size-10 rounded-xl" />
-                  <div className="min-w-40 flex-1 space-y-2">
-                    <Skeleton className="h-4 w-48" />
-                    <Skeleton className="h-3 w-64" />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32 sm:w-48" />
+                    <Skeleton className="h-3 w-40 sm:w-64" />
                   </div>
                   <div className="space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="ml-auto h-8 w-28" />
+                    <Skeleton className="h-5 w-16 sm:w-24" />
+                    <Skeleton className="ml-auto h-8 w-20 sm:w-28" />
                   </div>
                 </div>
-                <Skeleton className="mt-4 h-3 w-2/3" />
+                <Skeleton className="mt-3 h-3 w-2/3 sm:mt-4" />
               </div>
             ))}
           </div>
@@ -450,9 +446,9 @@ export default function FlightSearch() {
         ) : (
           <>
             {fareInsight && (
-              <div className="mb-6 flex items-start gap-3 rounded-2xl border border-brand-100 bg-brand-50/60 p-4">
-                <Sparkles className="mt-0.5 size-4 shrink-0 text-brand-600" />
-                <p className="text-sm text-slate-600">
+              <div className="mb-4 flex items-start gap-2 rounded-2xl border border-brand-100 bg-brand-50/60 p-3 sm:mb-6 sm:gap-3 sm:p-4">
+                <Sparkles className="mt-0.5 size-3.5 shrink-0 text-brand-600 sm:size-4" />
+                <p className="text-xs text-slate-600 sm:text-sm">
                   <span className="font-bold text-slate-800">Fare insight:</span> the cheapest option today is{' '}
                   <span className="font-bold text-brand-700">₹{fareInsight.min.toLocaleString('en-IN')}</span> — about{' '}
                   <span className="font-bold text-emerald-600">{fareInsight.belowPct}% below</span> the average fare on this route.
@@ -460,32 +456,32 @@ export default function FlightSearch() {
                 </p>
               </div>
             )}
-          <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-[280px_1fr]">
             {/* Desktop filters */}
             <aside className="sticky top-24 hidden h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-card lg:block">
               <div className="mb-6">{FilterHeader}</div>
               {FilterBody}
             </aside>
 
-            <div>
+            <div className="min-w-0">
               {/* Toolbar */}
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="font-display text-lg font-semibold text-slate-900">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2 sm:mb-4 sm:gap-3">
+                <div className="min-w-0">
+                  <h2 className="font-display text-base font-semibold text-slate-900 sm:text-lg">
                     {filtered.length} flight{filtered.length > 1 ? 's' : ''} found
                   </h2>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-[10px] text-slate-500 sm:text-xs">
                     {q.from} → {q.to} · {formatDate(q.date)}{q.trip === 'roundtrip' && q.returnDate ? ` · return ${formatDate(q.returnDate)}` : ''}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   {/* Mobile filters — full-screen sheet */}
                   <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
                     <SheetTrigger asChild>
-                      <Button variant="secondary" className="lg:hidden">
-                        <Filter className="size-4" /> Filters
+                      <Button variant="secondary" size="sm" className="lg:hidden">
+                        <Filter className="size-3.5 sm:size-4" /> <span className="hidden sm:inline">Filters</span><span className="sm:hidden">Filter</span>
                         {activeFilterCount > 0 && (
-                          <span className="flex size-5 items-center justify-center rounded-full bg-brand-600 text-[10px] font-bold text-white">
+                          <span className="flex size-4 items-center justify-center rounded-full bg-brand-600 text-[9px] font-bold text-white sm:size-5 sm:text-[10px]">
                             {activeFilterCount}
                           </span>
                         )}
@@ -493,18 +489,18 @@ export default function FlightSearch() {
                     </SheetTrigger>
                     <SheetContent side="bottom" className="inset-0 max-h-none rounded-none! border-0! p-0">
                       <div className="flex h-full flex-col">
-                        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 pr-14">
-                          <SheetTitle className="flex items-center gap-2 font-display text-lg">
-                            <SlidersHorizontal className="size-5 text-brand-600" /> Filter flights
+                        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 pr-14 sm:px-5 sm:py-4">
+                          <SheetTitle className="flex items-center gap-2 font-display text-base sm:text-lg">
+                            <SlidersHorizontal className="size-4 text-brand-600 sm:size-5" /> Filter flights
                           </SheetTitle>
                           <button type="button" className="shrink-0 text-xs font-bold text-brand-600 hover:underline" onClick={resetFilters}>
                             Reset all
                           </button>
                         </div>
-                        <div className="flex-1 overflow-y-auto px-5 py-5">
+                        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">
                           {FilterBody}
                         </div>
-                        <div className="border-t border-slate-100 bg-white px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-4">
+                        <div className="border-t border-slate-100 bg-white px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 sm:px-5 sm:pt-4">
                           <Button size="lg" className="w-full" onClick={() => setFiltersOpen(false)}>
                             Show {filtered.length} flight{filtered.length !== 1 ? 's' : ''}
                           </Button>
@@ -521,7 +517,7 @@ export default function FlightSearch() {
                         type="button"
                         onClick={() => setSort(s.id)}
                         className={cn(
-                          'rounded-lg px-3 py-1.5 text-xs font-semibold transition-all',
+                          'rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-all sm:px-3 sm:text-xs',
                           sort === s.id ? 'bg-brand-600 text-white shadow-soft' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
                         )}
                       >
@@ -532,7 +528,7 @@ export default function FlightSearch() {
 
                   {/* Sort select (mobile) */}
                   <Select value={sort} onValueChange={setSort}>
-                    <SelectTrigger className="w-40 sm:hidden">
+                    <SelectTrigger className="h-9 w-32 text-xs sm:hidden sm:h-11 sm:w-40 sm:text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -546,12 +542,12 @@ export default function FlightSearch() {
 
               {/* Airline quick filters */}
               {quickAirlines.length > 1 && (
-                <div className="mb-4 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                <div className="-mx-3 mb-3 flex gap-1.5 overflow-x-auto px-3 pb-1 scrollbar-hide sm:mb-4 sm:gap-2">
                   <button
                     type="button"
                     onClick={() => setAirlines([])}
                     className={cn(
-                      'flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all',
+                      'flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold transition-all sm:gap-1.5 sm:px-3.5 sm:py-1.5 sm:text-xs',
                       airlines.length === 0 ? 'border-brand-600 bg-brand-600 text-white shadow-soft' : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300',
                     )}
                   >
@@ -565,30 +561,30 @@ export default function FlightSearch() {
                         type="button"
                         onClick={() => toggleAirline(a.id)}
                         className={cn(
-                          'flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all',
+                          'flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold transition-all sm:gap-1.5 sm:px-3.5 sm:py-1.5 sm:text-xs',
                           active ? 'border-brand-600 bg-brand-600 text-white shadow-soft' : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300',
                         )}
                       >
                         {a.name}
-                        <span className={cn('rounded-full px-1.5 text-[10px] font-bold', active ? 'bg-white/25 text-white' : 'bg-slate-100 text-slate-500')}>{a.count}</span>
+                        <span className={cn('rounded-full px-1 text-[8px] font-bold sm:px-1.5 sm:text-[10px]', active ? 'bg-white/25 text-white' : 'bg-slate-100 text-slate-500')}>{a.count}</span>
                       </button>
                     )
                   })}
                 </div>
               )}
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {filtered.map((f, i) => (
                   <FlightCard key={f.id} flight={f} highlight={i === 0 ? topLabel : null} />
                 ))}
               </div>
 
               {q.trip === 'roundtrip' && data?.returnFlights?.length > 0 && (
-                <div className="mt-10">
-                  <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold text-slate-900">
-                    <Plane className="size-5 text-brand-600" /> Return flights ({q.returnDate})
+                <div className="mt-8 sm:mt-10">
+                  <h3 className="mb-2 flex items-center gap-2 font-display text-base font-semibold text-slate-900 sm:mb-3 sm:text-lg">
+                    <Plane className="size-4 text-brand-600 sm:size-5" /> Return flights ({q.returnDate})
                   </h3>
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {data.returnFlights.slice(0, 3).map((f) => (
                       <FlightCard key={f.id} flight={f} showReturn />
                     ))}

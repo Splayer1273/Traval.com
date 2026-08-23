@@ -110,15 +110,15 @@ function LazyImage({ src, alt, className = '', imgClassName = '', hoverScale = t
 /*  Full-bleed wide image between sections                                   */
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
-export function CinematicBreak({ images, height = 'h-[300px] sm:h-[400px] lg:h-[480px]', overlay = true, caption, captionSub }) {
+export function CinematicBreak({ images, height = 'h-[200px] sm:h-[300px] lg:h-[480px]', overlay = true, caption, captionSub }) {
   const src = Array.isArray(images) ? images[0] : images
   const alt = typeof src === 'object' ? src.alt : ''
   const url = typeof src === 'object' ? src.src : src
 
   return (
-    <ImageBreakWrapper className="my-8 sm:my-12 lg:my-16">
+    <ImageBreakWrapper className="my-6 sm:my-8 lg:my-12 lg:my-16">
       <div className="container-x">
-        <div className={cn('relative rounded-3xl overflow-hidden shadow-lift', height)}>
+        <div className={cn('relative rounded-2xl overflow-hidden shadow-lift sm:rounded-3xl', height)}>
           <LazyImage src={url} alt={alt} className="absolute inset-0" hoverScale />
           {overlay && (
             <>
@@ -127,13 +127,13 @@ export function CinematicBreak({ images, height = 'h-[300px] sm:h-[400px] lg:h-[
             </>
           )}
           {caption && (
-            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-              <p className="text-sm font-semibold text-white/90">{caption}</p>
-              {captionSub && <p className="mt-1 text-xs text-white/60">{captionSub}</p>}
+            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 lg:p-8">
+              <p className="text-xs font-semibold text-white/90 sm:text-sm">{caption}</p>
+              {captionSub && <p className="mt-1 text-[11px] text-white/60 sm:text-xs">{captionSub}</p>}
             </div>
           )}
           {/* Subtle corner accent */}
-          <div className="absolute right-4 top-4 size-1.5 rounded-full bg-white/40" />
+          <div className="absolute right-3 top-3 size-1.5 rounded-full bg-white/40 sm:right-4 sm:top-4" />
         </div>
       </div>
     </ImageBreakWrapper>
@@ -147,9 +147,9 @@ export function CinematicBreak({ images, height = 'h-[300px] sm:h-[400px] lg:h-[
 
 export function DualPanelBreak({ images, captions }) {
   return (
-    <ImageBreakWrapper className="my-8 sm:my-12 lg:my-16">
+    <ImageBreakWrapper className="my-6 sm:my-8 lg:my-12 lg:my-16">
       <div className="container-x">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:gap-5">
           {(Array.isArray(images) ? images : [images, images]).slice(0, 2).map((img, i) => {
             const url = typeof img === 'object' ? img.src : img
             const alt = typeof img === 'object' ? img.alt : ''
@@ -158,11 +158,11 @@ export function DualPanelBreak({ images, captions }) {
                 <LazyImage
                   src={url}
                   alt={alt}
-                  className="h-[220px] sm:h-[280px] lg:h-[340px] rounded-2xl shadow-soft"
+                  className="h-[180px] sm:h-[220px] lg:h-[280px] xl:h-[340px] rounded-2xl shadow-soft"
                 />
                 {captions?.[i] && (
-                  <div className="absolute bottom-0 left-0 right-0 rounded-b-2xl bg-gradient-to-t from-black/50 to-transparent p-5">
-                    <p className="text-sm font-semibold text-white">{captions[i]}</p>
+                  <div className="absolute bottom-0 left-0 right-0 rounded-b-2xl bg-gradient-to-t from-black/50 to-transparent p-4 sm:p-5">
+                    <p className="text-xs font-semibold text-white sm:text-sm">{captions[i]}</p>
                   </div>
                 )}
               </div>
@@ -181,9 +181,9 @@ export function DualPanelBreak({ images, captions }) {
 
 export function TrioBreak({ images }) {
   return (
-    <ImageBreakWrapper className="my-8 sm:my-12 lg:my-16">
+    <ImageBreakWrapper className="my-6 sm:my-8 lg:my-12 lg:my-16">
       <div className="container-x">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           {(Array.isArray(images) ? images : [images, images, images]).slice(0, 3).map((img, i) => {
             const url = typeof img === 'object' ? img.src : img
             const alt = typeof img === 'object' ? img.alt : ''
@@ -192,7 +192,7 @@ export function TrioBreak({ images }) {
                 key={i}
                 src={url}
                 alt={alt}
-                className="h-[200px] sm:h-[240px] lg:h-[280px] rounded-2xl shadow-soft"
+                className="h-[180px] sm:h-[200px] lg:h-[240px] xl:h-[280px] rounded-2xl shadow-soft"
               />
             )
           })}
@@ -209,9 +209,9 @@ export function TrioBreak({ images }) {
 
 export function QuadStripBreak({ images }) {
   return (
-    <ImageBreakWrapper className="my-8 sm:my-12 lg:my-16">
+    <ImageBreakWrapper className="my-6 sm:my-8 lg:my-12 lg:my-16">
       <div className="container-x">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3 lg:gap-4">
           {(Array.isArray(images) ? images : [images, images, images, images]).slice(0, 4).map((img, i) => {
             const url = typeof img === 'object' ? img.src : img
             const alt = typeof img === 'object' ? img.alt : ''
@@ -238,17 +238,17 @@ export function QuadStripBreak({ images }) {
 export function AsymmetricGridBreak({ images }) {
   const imgs = Array.isArray(images) ? images : [images, images, images]
   return (
-    <ImageBreakWrapper className="my-8 sm:my-12 lg:my-16">
+    <ImageBreakWrapper className="my-6 sm:my-8 lg:my-12 lg:my-16">
       <div className="container-x">
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-5 sm:gap-4">
           <div className="sm:col-span-3">
             <LazyImage
               src={typeof imgs[0] === 'object' ? imgs[0].src : imgs[0]}
               alt={typeof imgs[0] === 'object' ? imgs[0].alt : ''}
-              className="h-[260px] sm:h-[320px] lg:h-[380px] rounded-2xl shadow-soft"
+              className="h-[200px] sm:h-[260px] lg:h-[320px] xl:h-[380px] rounded-2xl shadow-soft"
             />
           </div>
-          <div className="sm:col-span-2 grid grid-rows-2 gap-4">
+          <div className="grid grid-rows-2 gap-3 sm:col-span-2 sm:gap-4">
             <LazyImage
               src={typeof imgs[1] === 'object' ? imgs[1].src : imgs[1]}
               alt={typeof imgs[1] === 'object' ? imgs[1].alt : ''}
@@ -271,12 +271,12 @@ export function AsymmetricGridBreak({ images }) {
 /*  Full-width parallax image with centered quote or text                    */
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
-export function ParallaxBreak({ src, alt, quote, author, height = 'h-[350px] sm:h-[450px] lg:h-[520px]' }) {
+export function ParallaxBreak({ src, alt, quote, author, height = 'h-[250px] sm:h-[350px] lg:h-[450px] xl:h-[520px]' }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, amount: 0.3 })
 
   return (
-    <ImageBreakWrapper className="my-8 sm:my-12 lg:my-16">
+    <ImageBreakWrapper className="my-6 sm:my-8 lg:my-12 lg:my-16">
       <div ref={ref} className={cn('relative overflow-hidden', height)}>
         <motion.img
           src={src}
@@ -290,19 +290,19 @@ export function ParallaxBreak({ src, alt, quote, author, height = 'h-[350px] sm:
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/40" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-black/10" />
         {quote && (
-          <div className="absolute inset-0 flex items-center justify-center px-6">
+          <div className="absolute inset-0 flex items-center justify-center px-4 sm:px-6">
             <motion.div
               className="max-w-xl text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
-              <Quote className="mx-auto mb-4 size-8 text-white/40" />
-              <p className="text-lg sm:text-xl font-display font-semibold leading-relaxed text-white drop-shadow-lg">
+              <Quote className="mx-auto mb-3 size-6 text-white/40 sm:mb-4 sm:size-8" />
+              <p className="text-base font-display font-semibold leading-relaxed text-white drop-shadow-lg sm:text-lg xl:text-xl">
                 {quote}
               </p>
               {author && (
-                <p className="mt-3 text-sm text-white/70">{author}</p>
+                <p className="mt-2 text-xs text-white/70 sm:mt-3 sm:text-sm">{author}</p>
               )}
             </motion.div>
           </div>
@@ -319,28 +319,28 @@ export function ParallaxBreak({ src, alt, quote, author, height = 'h-[350px] sm:
 
 export function EditorialBreak({ src, alt, caption, captionDetail, reverse = false }) {
   return (
-    <ImageBreakWrapper className="my-8 sm:my-12 lg:my-16">
+    <ImageBreakWrapper className="my-6 sm:my-8 lg:my-12 lg:my-16">
       <div className="container-x">
         <div className={cn(
-          'grid grid-cols-1 items-center gap-6 sm:gap-8 lg:grid-cols-5',
+          'grid grid-cols-1 items-center gap-4 sm:gap-6 lg:grid-cols-5 lg:gap-8',
           reverse && 'lg:[direction:rtl]'
         )}>
           <div className="lg:col-span-3 lg:[direction:ltr]">
             <LazyImage
               src={src}
               alt={alt}
-              className="h-[280px] sm:h-[340px] lg:h-[400px] rounded-2xl shadow-lift"
+              className="h-[200px] sm:h-[280px] lg:h-[340px] xl:h-[400px] rounded-2xl shadow-lift"
             />
           </div>
           <div className="lg:col-span-2 lg:[direction:ltr]">
-            <div className="rounded-2xl bg-slate-50 p-6 sm:p-8">
+            <div className="rounded-2xl bg-slate-50 p-4 sm:p-6 lg:p-8">
               {caption && (
-                <p className="font-display text-lg sm:text-xl font-semibold text-slate-900 leading-relaxed">
+                <p className="font-display text-base font-semibold text-slate-900 leading-relaxed sm:text-lg xl:text-xl">
                   {caption}
                 </p>
               )}
               {captionDetail && (
-                <p className="mt-3 text-sm leading-relaxed text-slate-500">
+                <p className="mt-2 text-xs leading-relaxed text-slate-500 sm:mt-3 sm:text-sm">
                   {captionDetail}
                 </p>
               )}

@@ -11,7 +11,7 @@ export default function SectionHeader({ eyebrow, title, subtitle, link, linkLabe
             <span className={cn('h-px w-6', light ? 'bg-sun-400' : 'bg-sun-500')} /> {eyebrow}
           </p>
         )}
-        <h2 className={cn('font-display text-2xl font-semibold sm:text-3xl', light ? 'text-white' : 'text-slate-900')}>{title}</h2>
+        <h2 className={cn('font-display text-xl font-semibold sm:text-2xl lg:text-3xl', light ? 'text-white' : 'text-slate-900')}>{title}</h2>
         {subtitle && <p className={cn('mt-2 text-sm sm:text-base', light ? 'text-slate-300' : 'text-slate-500')}>{subtitle}</p>}
       </div>
       {link && (

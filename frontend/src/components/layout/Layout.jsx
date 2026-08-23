@@ -15,9 +15,9 @@ export default function Layout({ padded = true }) {
   const isFullBleed = pathname === '/' || pathname.startsWith('/checkout') || pathname.startsWith('/confirmation')
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col overflow-x-clip">
       <Navbar />
-      <main className={cn('flex-1', !padded && 'flex flex-col', !isFullBleed && 'pb-16 md:pb-0')}>
+      <main className={cn('flex-1', !padded && 'flex flex-col', !isFullBleed && 'pb-20 md:pb-0')}>
         <Outlet />
       </main>
       <Footer />

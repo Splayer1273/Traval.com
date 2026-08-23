@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Download, UserRound, CreditCard, MapPin, Calendar, Clock, Check, Plane, ArrowRight,
+  Download, UserRound, CreditCard, MapPin, Calendar, Clock, Check, Plane, ArrowRight, Loader2,
 } from 'lucide-react'
 import { Badge } from '../components/ui/badge.jsx'
 import { Button } from '../components/ui/button.jsx'
@@ -12,6 +13,7 @@ import { Price } from '../components/Price.jsx'
 import { bookingApi } from '../services/bookingApi.js'
 import { useToast } from '../context/ToastContext.jsx'
 import { formatDate, formatTime, fullName } from '../utils/format.js'
+import { downloadTicket } from '../utils/generateTicket.js'
 
 const STATUS_BADGE = {
   confirmed: { label: 'Confirmed', variant: 'success' },
@@ -22,11 +24,31 @@ const STATUS_BADGE = {
 
 export default function BookingDetail() {
   const { id } = useParams()
-  const { toast } = useToast()
+  const { toast, error: showError } = useToast()
   const { data: b, isLoading } = useQuery({
     queryKey: ['booking', id],
     queryFn: () => bookingApi.getBooking(id),
   })
+
+  const [downloading, setDownloading] = useState(null)
+
+  const handleDownload = async (type) => {
+    if (!b) return
+    setDownloading(type)
+    try {
+      const result = downloadTicket(b, type)
+      if (result.success) {
+        toast(`${type === 'invoice' ? 'Invoice' : 'E-ticket'} downloaded successfully.`, 'Download')
+      } else {
+        showError(`Unable to download your ${type === 'invoice' ? 'invoice' : 'e-ticket'}. Please try again.`, 'Download failed')
+      }
+    } catch (err) {
+      console.error('Download error:', err)
+      showError(`Unable to download your ${type === 'invoice' ? 'invoice' : 'e-ticket'}. Please try again.`, 'Download failed')
+    } finally {
+      setDownloading(null)
+    }
+  }
 
   if (isLoading) return <div className="container-x py-10"><Skeleton className="h-96 w-full rounded-2xl" /></div>
   if (!b) {
@@ -42,8 +64,6 @@ export default function BookingDetail() {
   const isFlight = b.type === 'flight'
   const isHotel = b.type === 'hotel'
 
-  const download = (what) => toast(`${what} for ${b.pnr} downloaded successfully.`, 'Download')
-
   return (
     <div className="bg-slate-50">
       <div className="container-x py-8">
@@ -58,8 +78,14 @@ export default function BookingDetail() {
             <p className="mt-1 text-sm text-slate-500">{b.destination}</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => download('E-ticket')}><Download className="size-4" /> Ticket</Button>
-            <Button variant="secondary" onClick={() => download('Invoice')}><Download className="size-4" /> Invoice</Button>
+            <Button variant="secondary" onClick={() => handleDownload('ticket')} disabled={downloading === 'ticket'}>
+              {downloading === 'ticket' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+              {downloading === 'ticket' ? 'Generating…' : 'E-Ticket'}
+            </Button>
+            <Button variant="secondary" onClick={() => handleDownload('invoice')} disabled={downloading === 'invoice'}>
+              {downloading === 'invoice' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+              {downloading === 'invoice' ? 'Generating…' : 'Invoice'}
+            </Button>
             <Button asChild><a href="/my-trips"><ArrowRight className="size-4" /> My Trips</a></Button>
           </div>
         </div>
@@ -241,7 +267,10 @@ export default function BookingDetail() {
                   <p className="flex items-center justify-between"><span className="text-slate-500">Paid via</span><span className="font-semibold text-slate-700">{b.payment.method}</span></p>
                   {b.payment.refunded && <p className="mt-1.5 flex items-center justify-between"><span className="text-slate-500">Refunded</span><span className="font-semibold text-emerald-600"><Price amount={b.payment.refunded} /></span></p>}
                 </div>
-                <Button variant="secondary" className="w-full" onClick={() => download('Invoice')}><Download className="size-4" /> Download invoice</Button>
+                <Button variant="secondary" className="w-full" onClick={() => handleDownload('invoice')} disabled={downloading === 'invoice'}>
+                  {downloading === 'invoice' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+                  {downloading === 'invoice' ? 'Generating…' : 'Download invoice'}
+                </Button>
               </CardContent>
             </Card>
 

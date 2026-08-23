@@ -11,7 +11,7 @@ export default function PackageCard({ pkg }) {
   const saved = has('package', pkg.id)
   return (
     <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
-      <Link to={`/packages/${pkg.id}`} className="relative block h-52 overflow-hidden">
+      <Link to={`/packages/${pkg.id}`} className="relative block h-44 overflow-hidden sm:h-52">
         <Img
           src={pkg.image}
           alt={pkg.name}
@@ -40,15 +40,15 @@ export default function PackageCard({ pkg }) {
       >
         <Heart className={cn('size-4', saved && 'fill-current')} />
       </button>
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <div className="flex items-start justify-between gap-2">
-          <div>
+          <div className="min-w-0">
             <Link to={`/packages/${pkg.id}`}>
-              <h3 className="font-display text-base font-semibold text-slate-900 transition-colors hover:text-brand-700">
+              <h3 className="font-display text-sm font-semibold text-slate-900 transition-colors hover:text-brand-700 sm:text-base">
                 {pkg.name}
               </h3>
             </Link>
-            <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
+            <p className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-500 sm:text-xs">
               <MapPin className="size-3" /> {pkg.destination}, {pkg.country}
             </p>
           </div>
@@ -57,24 +57,24 @@ export default function PackageCard({ pkg }) {
           </span>
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-2.5 flex flex-wrap gap-1 sm:mt-3 sm:gap-1.5">
           {pkg.includes.flight && <Badge variant="sun">✈ Flights</Badge>}
           {pkg.includes.hotel && <Badge variant="default">Hotel</Badge>}
           {pkg.includes.meals && <Badge variant="success">Meals</Badge>}
           {pkg.includes.visa && <Badge variant="secondary">Visa</Badge>}
         </div>
 
-        <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-3">
+        <div className="mt-3 flex items-end justify-between border-t border-slate-100 pt-3 sm:mt-4">
           <div>
-            <p className="text-[11px] uppercase tracking-wide text-slate-400">Starting from</p>
+            <p className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-[11px]">Starting from</p>
             <p className="flex items-baseline gap-1">
-              <Price amount={pkg.price} className="text-xl font-bold text-slate-900" />
-              <span className="text-xs text-slate-400">/ person</span>
+              <Price amount={pkg.price} className="text-lg font-bold text-slate-900 sm:text-xl" />
+              <span className="text-[11px] text-slate-400 sm:text-xs">/ person</span>
             </p>
           </div>
           <Link
             to={`/packages/${pkg.id}`}
-            className="rounded-lg bg-brand-600 px-3.5 py-2 text-xs font-bold text-white transition-colors hover:bg-brand-700"
+            className="rounded-lg bg-brand-600 px-3 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-brand-700 sm:px-3.5 sm:py-2 sm:text-xs"
           >
             View Details
           </Link>

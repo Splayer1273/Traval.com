@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Facebook, Instagram, Twitter, Linkedin, Youtube, Mail, Phone, MapPin,
-  ShieldCheck, CreditCard, BadgeCheck,
+  ShieldCheck, CreditCard, BadgeCheck, ChevronDown, ChevronUp,
 } from 'lucide-react'
 import Logo from './Logo.jsx'
 
@@ -58,49 +59,72 @@ const SOCIALS = [
   { icon: Youtube, label: 'YouTube' },
 ]
 
+function FooterColumn({ col }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div>
+      {/* Mobile: collapsible accordion */}
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between py-3 text-sm font-bold uppercase tracking-widest text-white lg:pointer-events-none lg:mb-4 lg:block lg:py-0"
+      >
+        {col.title}
+        <span className="lg:hidden">
+          {open ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+        </span>
+      </button>
+      <ul className={`space-y-2.5 ${open ? 'block' : 'hidden'} lg:block`}>
+        {col.links.map((l) => (
+          <li key={l.label}>
+            {l.isExternal ? (
+              <a href={l.to} className="text-sm text-slate-400 transition-colors hover:text-sun-400"
+                {...(l.to.startsWith('mailto:') || l.to.startsWith('tel:') ? {} : { onClick: (e) => e.preventDefault() })}>
+                {l.label}
+              </a>
+            ) : (
+              <Link to={l.to} className="text-sm text-slate-400 transition-colors hover:text-sun-400">{l.label}</Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export default function Footer() {
   return (
     <footer className="mt-16 border-t border-slate-200 bg-slate-950 text-slate-300">
-      <div className="container-x grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-6">
-        <div className="lg:col-span-2">
-          <Logo light />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-400">
-            Smart Corporate Travel Solutions for Modern Businesses
-          </p>
-          <p className="mt-3 max-w-xs text-xs leading-relaxed text-slate-500">
-            AkbarBizvoy is the corporate travel division of the Akbar Group, providing businesses with professional travel services, technology-enabled travel management and dedicated corporate support.
-          </p>
-          <div className="mt-5 flex gap-2">
-            {SOCIALS.map((s) => (
-              <a key={s.label} href="#" onClick={(e) => e.preventDefault()} aria-label={s.label}
-                className="flex size-9 items-center justify-center rounded-full border border-white/10 text-slate-400 transition-all hover:border-sun-500 hover:bg-sun-500 hover:text-white">
-                <s.icon className="size-4" />
-              </a>
-            ))}
-          </div>
-        </div>
-        {COLUMNS.map((col) => (
-          <div key={col.title}>
-            <h4 className="mb-4 text-sm font-bold uppercase tracking-widest text-white">{col.title}</h4>
-            <ul className="space-y-2.5">
-              {col.links.map((l) => (
-                <li key={l.label}>
-                  {l.isExternal ? (
-                    <a href={l.to} className="text-sm text-slate-400 transition-colors hover:text-sun-400"
-                      {...(l.to.startsWith('mailto:') || l.to.startsWith('tel:') ? {} : { onClick: (e) => e.preventDefault() })}>
-                      {l.label}
-                    </a>
-                  ) : (
-                    <Link to={l.to} className="text-sm text-slate-400 transition-colors hover:text-sun-400">{l.label}</Link>
-                  )}
-                </li>
+      <div className="container-x py-12">
+        {/* Mobile: 2-col grid, Tablet: 2-col grid, Desktop: 6-col grid */}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-6 lg:gap-10">
+          {/* Brand column - spans full on mobile, 2 cols on desktop */}
+          <div className="sm:col-span-2 lg:col-span-2">
+            <Logo light />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-400">
+              Smart Corporate Travel Solutions for Modern Businesses
+            </p>
+            <p className="mt-3 max-w-xs text-xs leading-relaxed text-slate-500">
+              AkbarBizvoy is the corporate travel division of the Akbar Group, providing businesses with professional travel services, technology-enabled travel management and dedicated corporate support.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {SOCIALS.map((s) => (
+                <a key={s.label} href="#" onClick={(e) => e.preventDefault()} aria-label={s.label}
+                  className="flex size-9 items-center justify-center rounded-full border border-white/10 text-slate-400 transition-all hover:border-sun-500 hover:bg-sun-500 hover:text-white">
+                  <s.icon className="size-4" />
+                </a>
               ))}
-            </ul>
+            </div>
           </div>
-        ))}
+          {/* Link columns */}
+          {COLUMNS.map((col) => (
+            <FooterColumn key={col.title} col={col} />
+          ))}
+        </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="container-x flex flex-col items-center justify-between gap-4 py-6 sm:flex-row">
+        <div className="container-x flex flex-col items-center justify-between gap-4 py-6 text-center sm:flex-row sm:text-left">
           <p className="text-xs text-slate-500">© 2026 Akbar Travels of India. All Rights Reserved.</p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
             <span className="flex items-center gap-1.5"><ShieldCheck className="size-4 text-emerald-400" /> Secure 256-bit payments</span>
