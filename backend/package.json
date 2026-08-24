@@ -1,7 +1,7 @@
 {
   "name": "sunrise-api",
   "version": "1.0.0",
-  "description": "Project Sunrise — Corporate Travel Platform API",
+  "description": "Akbar Bizvoy — Corporate Travel Platform API",
   "type": "module",
   "main": "server.js",
   "scripts": {

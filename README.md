@@ -1,4 +1,4 @@
-# ✈️ Project Sunrise — MERN Corporate Travel Platform
+# ✈️ Akbar Bizvoy — MERN Corporate Travel Platform
 
 A professional, light-themed corporate travel management platform built with the **MERN** stack:
 MongoDB, Express, React (Vite) and Node.js.
@@ -128,4 +128,4 @@ All seeded accounts use the password **`Password@123`**
 
 ---
 
-*Built for Project Sunrise — corporate travel made effortless.*
+*Built for Akbar Bizvoy — corporate travel made effortless.*

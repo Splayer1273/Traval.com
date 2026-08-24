@@ -22,7 +22,7 @@ const VALUES = [
 export default function About() {
   return (
     <div>
-      <PageHero image="roadtrip" title="About Project Sunrise" subtitle="We believe travel should be effortless, transparent and joyful" crumb={[{ label: 'About Us' }]} />
+      <PageHero image="roadtrip" title="About Akbar Bizvoy" subtitle="We believe travel should be effortless, transparent and joyful" crumb={[{ label: 'About Us' }]} />
 
       <div className="container-x mt-10 space-y-14">
         {/* Intro */}
@@ -34,12 +34,12 @@ export default function About() {
                 Born from a cancelled flight and a long night at the airport
               </h2>
               <p className="mt-4 leading-relaxed text-slate-600">
-                Project Sunrise began in 2021 when our founders spent 14 hours stranded at Mumbai airport after a missed connection.
+                Akbar Bizvoy began in 2021 when our founders spent 14 hours stranded at Mumbai airport after a missed connection.
                 The airline app failed, the helpline rang busy, and nobody knew who to trust. That night became the blueprint for
                 everything we build: <span className="font-semibold text-slate-800">clarity, control and care</span> for every traveller.
               </p>
               <p className="mt-3 leading-relaxed text-slate-600">
-                Today, millions of travellers search flights, book hotels and plan holidays through Project Sunrise — with the same
+                Today, millions of travellers search flights, book hotels and plan holidays through Akbar Bizvoy — with the same
                 promise we made on day one: show real prices, protect every booking, and answer when you call.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">

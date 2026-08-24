@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Project Sunrise — MERN Corporate Travel Platform",
+  "description": "Akbar Bizvoy — MERN Corporate Travel Platform",
   "scripts": {
     "install:all": "cd backend && npm install && cd ../frontend && npm install",
     "seed": "cd backend && npm run seed",

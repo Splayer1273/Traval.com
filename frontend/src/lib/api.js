@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 /**
- * Shared Axios instance for the Project Sunrise API.
+ * Shared Axios instance for the Akbar Bizvoy API.
  *
  * The app currently runs entirely on local mock data through the `services/*`
  * modules, but those modules are structured to swap their mock implementations

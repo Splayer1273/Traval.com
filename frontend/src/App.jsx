@@ -43,6 +43,7 @@ import ForgotPassword from './pages/auth/ForgotPassword.jsx'
 import ResetPassword from './pages/auth/ResetPassword.jsx'
 import Checkout from './pages/Checkout.jsx'
 import Confirmation from './pages/Confirmation.jsx'
+import ETicket from './pages/ETicket.jsx'
 import FlightStatus from './pages/extras/FlightStatus.jsx'
 import CurrencyConverter from './pages/extras/CurrencyConverter.jsx'
 import TravelChecklist from './pages/extras/TravelChecklist.jsx'
@@ -111,6 +112,7 @@ export default function App() {
         {/* Checkout */}
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/confirmation/:id" element={<Confirmation />} />
+        <Route path="/e-ticket/:id" element={<ETicket />} />
 
         {/* Account */}
         <Route path="/account" element={<AccountLayout />}>

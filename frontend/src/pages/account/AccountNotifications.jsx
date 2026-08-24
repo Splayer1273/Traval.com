@@ -33,7 +33,7 @@ export default function AccountNotifications() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2"><Mail className="size-5 text-brand-600" /> Notification preferences</CardTitle>
-        <CardDescription>Choose how Project Sunrise reaches you.</CardDescription>
+        <CardDescription>Choose how Akbar Bizvoy reaches you.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="divide-y divide-slate-100">

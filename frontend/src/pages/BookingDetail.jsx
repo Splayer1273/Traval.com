@@ -1,8 +1,7 @@
-import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Download, UserRound, CreditCard, MapPin, Calendar, Clock, Check, Plane, ArrowRight, Loader2,
+  Download, UserRound, CreditCard, MapPin, Calendar, Clock, Check, Plane, ArrowRight,
 } from 'lucide-react'
 import { Badge } from '../components/ui/badge.jsx'
 import { Button } from '../components/ui/button.jsx'
@@ -30,11 +29,8 @@ export default function BookingDetail() {
     queryFn: () => bookingApi.getBooking(id),
   })
 
-  const [downloading, setDownloading] = useState(null)
-
-  const handleDownload = async (type) => {
+  const handleDownload = (type) => {
     if (!b) return
-    setDownloading(type)
     try {
       const result = downloadTicket(b, type)
       if (result.success) {
@@ -45,8 +41,6 @@ export default function BookingDetail() {
     } catch (err) {
       console.error('Download error:', err)
       showError(`Unable to download your ${type === 'invoice' ? 'invoice' : 'e-ticket'}. Please try again.`, 'Download failed')
-    } finally {
-      setDownloading(null)
     }
   }
 
@@ -78,13 +72,11 @@ export default function BookingDetail() {
             <p className="mt-1 text-sm text-slate-500">{b.destination}</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => handleDownload('ticket')} disabled={downloading === 'ticket'}>
-              {downloading === 'ticket' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
-              {downloading === 'ticket' ? 'Generating…' : 'E-Ticket'}
+            <Button variant="secondary" onClick={() => handleDownload('ticket')}>
+              <Download className="size-4" /> Download
             </Button>
-            <Button variant="secondary" onClick={() => handleDownload('invoice')} disabled={downloading === 'invoice'}>
-              {downloading === 'invoice' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
-              {downloading === 'invoice' ? 'Generating…' : 'Invoice'}
+            <Button variant="secondary" onClick={() => handleDownload('invoice')}>
+              <Download className="size-4" /> Invoice
             </Button>
             <Button asChild><a href="/my-trips"><ArrowRight className="size-4" /> My Trips</a></Button>
           </div>
@@ -267,9 +259,8 @@ export default function BookingDetail() {
                   <p className="flex items-center justify-between"><span className="text-slate-500">Paid via</span><span className="font-semibold text-slate-700">{b.payment.method}</span></p>
                   {b.payment.refunded && <p className="mt-1.5 flex items-center justify-between"><span className="text-slate-500">Refunded</span><span className="font-semibold text-emerald-600"><Price amount={b.payment.refunded} /></span></p>}
                 </div>
-                <Button variant="secondary" className="w-full" onClick={() => handleDownload('invoice')} disabled={downloading === 'invoice'}>
-                  {downloading === 'invoice' ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
-                  {downloading === 'invoice' ? 'Generating…' : 'Download invoice'}
+                <Button variant="secondary" className="w-full" onClick={() => handleDownload('invoice')}>
+                  <Download className="size-4" /> Download invoice
                 </Button>
               </CardContent>
             </Card>

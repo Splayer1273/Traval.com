@@ -75,7 +75,7 @@ async function seed() {
     {
       employee: rahul._id, company: acme._id, destination: 'Bengaluru', startDate: iso(12), endDate: iso(15),
       purpose: 'Product demo & sprint planning with ABC Technologies', estimatedBudget: 19229, estimatedCost: 19229,
-      ref: 'TR-8K3M2A', title: 'Client Meeting — Bengaluru', from: 'Mumbai', client: 'ABC Technologies', project: 'Project Sunrise', costCenter: 'CC-4201', travellers: 1,
+      ref: 'TR-8K3M2A', title: 'Client Meeting — Bengaluru', from: 'Mumbai', client: 'ABC Technologies', project: 'Akbar Bizvoy', costCenter: 'CC-4201', travellers: 1,
       flight: { airline: 'IndiGo', flightNumber: '6E-6111', cabin: 'Economy', from: { code: 'BOM', city: 'Mumbai' }, to: { code: 'BLR', city: 'Bengaluru' }, dep: at(12, 8, 30), arr: at(12, 10, 10), durationMin: 100, stops: 0, price: 3299, baggage: '23 kg', refundable: false },
       hotel: { name: 'Royal Orchid Central', city: 'Bengaluru', star: 3, room: 'Executive Room', pricePerNight: 4500, nights: 3, total: 15930, taxPct: 18 },
       policy: { flight: 'within', hotel: 'within', violation: false },
@@ -91,7 +91,7 @@ async function seed() {
     {
       employee: rahul._id, company: acme._id, destination: 'Delhi', startDate: iso(30), endDate: iso(33),
       purpose: 'Attend SaaS India Summit 2026', estimatedBudget: 23907, estimatedCost: 23907,
-      ref: 'TR-9PL2QW', title: 'Tech Conference — Delhi', from: 'Mumbai', project: 'Project Sunrise', costCenter: 'CC-4201', travellers: 1,
+      ref: 'TR-9PL2QW', title: 'Tech Conference — Delhi', from: 'Mumbai', project: 'Akbar Bizvoy', costCenter: 'CC-4201', travellers: 1,
       flight: { airline: 'Vistara', flightNumber: 'UK-911', cabin: 'Economy', from: { code: 'BOM', city: 'Mumbai' }, to: { code: 'DEL', city: 'Delhi' }, dep: at(30, 9, 0), arr: at(30, 11, 25), durationMin: 145, stops: 0, price: 5499, baggage: '23 kg', refundable: true },
       hotel: { name: 'Courtyard by Marriott', city: 'Delhi', star: 3, room: 'Standard Room', pricePerNight: 5200, nights: 3, total: 18408, taxPct: 18 },
       policy: { flight: 'within', hotel: 'within', violation: false },

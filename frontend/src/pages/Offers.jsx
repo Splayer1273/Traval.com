@@ -84,7 +84,7 @@ export default function Offers() {
         <div className="mt-12 rounded-3xl bg-gradient-to-r from-slate-900 via-brand-900 to-slate-900 p-8 text-center text-white shadow-lift sm:p-12">
           <p className="text-xs font-bold uppercase tracking-widest text-sun-400">Refer & earn</p>
           <h2 className="mx-auto mt-2 max-w-md font-display text-2xl font-semibold sm:text-3xl">
-            Share Project Sunrise with friends & get ₹500 each
+            Share Akbar Bizvoy with friends & get ₹500 each
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-slate-300">
             Your friend gets ₹500 off their first booking, and you get ₹500 credit the moment they travel.

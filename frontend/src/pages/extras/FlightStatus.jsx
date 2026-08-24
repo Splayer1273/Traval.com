@@ -29,7 +29,7 @@ export default function FlightStatus() {
 
   return (
     <div>
-      <PageHero image="airport" title="Flight Status" subtitle="Track any Project Sunrise flight in real time" crumb={[{ label: 'Flight Status' }]} />
+      <PageHero image="airport" title="Flight Status" subtitle="Track any Akbar Bizvoy flight in real time" crumb={[{ label: 'Flight Status' }]} />
 
       <div className="container-x mt-8">
         <Card className="mx-auto max-w-2xl">

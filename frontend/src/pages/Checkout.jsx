@@ -124,7 +124,7 @@ export default function Checkout() {
       const id = booking.id
       clear()
       toast('Payment successful — your booking is confirmed!', 'Booking confirmed 🎉')
-      navigate(`/confirmation/${id}`)
+      navigate(`/e-ticket/${id}`)
     } catch (e) {
       error(e.message, 'Payment failed')
     } finally {

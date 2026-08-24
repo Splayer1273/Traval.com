@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) =>
   res.json({
     success: true,
-    name: 'Project Sunrise API',
+    name: 'Akbar Bizvoy API',
     version: '1.0.0',
     endpoints: ['/api/auth', '/api/users', '/api/companies', '/api/trips', '/api/bookings', '/api/approvals', '/api/expenses'],
   })
@@ -57,7 +57,7 @@ const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(() => {
-    app.listen(PORT, () => console.log(`🚀 Project Sunrise API running on http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`🚀 Akbar Bizvoy API running on http://localhost:${PORT}`));
   })
   .catch((err) => {
     console.error('❌ Database connection failed:', err.message);

@@ -1,5 +1,5 @@
 /**
- * Central type definitions for Project Sunrise domain models.
+ * Central type definitions for Akbar Bizvoy domain models.
  * The app is plain JS (Vite + React), so these serve as living documentation
  * for the shapes used across data/, services/ and components/. If the project
  * migrates to TypeScript later, these map 1:1 to interfaces.
